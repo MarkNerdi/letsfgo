@@ -1,0 +1,46 @@
+{
+    // general
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "editor.trimAutoWhitespace": true,
+    "editor.insertSpaces": true,
+    "editor.wordWrapColumn": 120,
+    "editor.rulers": [ 120 ],
+    "editor.tabSize": 4,
+    "editor.showUnused": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    },
+    "files.autoSave": "afterDelay",
+    "files.trimTrailingWhitespace": false,
+    "files.watcherExclude": {
+        ".git": true,
+        "node_modules": true
+    },
+
+    // js/ts
+    "typescript.preferences.importModuleSpecifier": "non-relative",
+
+    // svelte
+    "svelte.enable-ts-plugin": true,
+    "svelte.ask-to-enable-ts-plugin": false,
+    "svelte.plugin.svelte.defaultScriptLanguage": "ts",
+    "svelte.plugin.svelte.format.config.printWidth": 120,
+    "svelte.plugin.svelte.format.config.singleQuote": true,
+    "svelte.plugin.svelte.format.config.svelteStrictMode": false,
+    "svelte.plugin.svelte.format.enable": true,
+
+    // other file extensions
+    "html.format.indentInnerHtml": true,
+    "json.format.keepLines": true,
+
+    // plugins
+    "eslint.validate": [ "javascript", "typescript", "svelte" ],
+    "formatFiles.excludedFolders": [
+        "node_modules",
+        ".vscode",
+        ".git",
+        ".svelte-kit",
+        ".vercel"
+    ],
+}

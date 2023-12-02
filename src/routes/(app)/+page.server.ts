@@ -1,0 +1,8 @@
+import { commonController } from '$lib/server/common/common.controller.ts';
+import type { PageServerLoad } from './$types';
+
+export const load: PageServerLoad = (async () => {
+    return {
+        amountOfTranslations: commonController.getTotalAmountOfEntries(),
+    };
+});

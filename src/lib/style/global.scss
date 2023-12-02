@@ -1,0 +1,167 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif&family=Roboto:wght@400;500&display=swap");
+
+:root {
+    --red: #9b1b23;
+    --lightRed: #ffd5d5;
+    --lightGrey: #f3f3f3;
+    --fontFamily: 'Roboto', sans-serif;
+    --fontFamilyAlt: 'Noto Serif', serif;
+    --gradient: linear-gradient(to right, var(--red), #b84141);
+    --gray: #aaaaaa
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    font-family: var(--fontFamily);
+    background-color: #f2f2f2;
+    margin: 0;
+    padding: 0;
+    color: black;
+    font-size: 1rem;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    @media only screen and (min-width: 1000px) {
+        overflow: hidden;
+    }
+}
+
+main {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+}
+
+header {
+    font-family: var(--fontFamilyAlt);
+    font-size: 30px;
+    padding: 20px;
+}
+
+h1,
+h2,
+h3,
+p {
+    margin: 0;
+    font-weight: normal;
+}
+
+a {
+    height: 100%;
+    display: block;
+    color: unset;
+    user-select: none;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    border: none;
+    outline: none;
+    resize: none;
+    box-shadow: none;
+    border: 2px solid var(--red);
+    border-radius: 5px;
+    background-color: white;
+    padding: 10px;
+    font-size: 16px;
+    font-family: var(--fontFamilyAlt);
+    line-height: 28px;
+}
+
+button {
+    border: none;
+    background-color: white;
+    font-family: var(--fontFamily);
+    display: block;
+    padding: 0;
+}
+
+// ui
+.primary-button {
+    width: 80%;
+    height: 40px;
+    font-weight: 500;
+    background: var(--gradient);
+    color: white;
+    text-align: center;
+    margin: auto;
+    font-size: 16px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &.full-width {
+        width: 100%;
+    }
+}
+
+.secondary-button {
+    width: 80%;
+    height: 40px;
+    font-weight: 500;
+    background: white;
+    border: 2px solid var(--gray);
+    color: black;
+    text-align: center;
+    margin: auto;
+    font-size: 16px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.material-icons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+// utils
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.padding {
+    padding: 20px;
+}

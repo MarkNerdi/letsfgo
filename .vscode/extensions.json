@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "svelte.svelte-vscode",
+        "fivethree.vscode-svelte-snippets",
+        "dbaeumer.vscode-eslint",
+        "jbockle.jbockle-format-files"
+    ],
+    "unwantedRecommendations": [ ]
+}

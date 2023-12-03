@@ -47,6 +47,7 @@
     grid-item {
         background-color: #b4ede7;
         border: 2px solid #72615f;
+        box-sizing: border-box;
 
         width: 100%;
         height: 100%;

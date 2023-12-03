@@ -22,6 +22,9 @@ export class Game {
         if (x >= this.width || x < 0 || y >= this.height || y < 0) {
             throw Error;
         }
+
+        new Audio('static/vine-boom.mp3').play();
+
         console.log(`setStone(${stone}, ${x}, ${y})`);
         
         this.state.update(state => {

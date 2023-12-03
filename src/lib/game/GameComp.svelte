@@ -5,9 +5,13 @@
     export let game: Game;
 
     let gameState = game.state;
+    let history = game.history;
+    let currentColor: FieldState = game.getCurrentColor();
+
+    $: $history, currentColor = game.getCurrentColor();
 
     function onEmptyClick(x: number, y: number): void {
-        game.setStone(FieldState.Black, x, y);
+        game.setStone(currentColor, x, y);
     }   
 </script>
 
@@ -16,7 +20,10 @@
         {#each row as field, index2}
             <grid-item>
                 {#if field === FieldState.Empty}
-                    <button on:click={() => onEmptyClick(index, index2)} >{index}, {index2}</button>
+                    <button
+                        class:black={currentColor === FieldState.Black}
+                        on:click={() => onEmptyClick(index, index2)}
+                    />
                 {:else}
                     <stone class:black={field === FieldState.Black} />
                 {/if}
@@ -56,8 +63,12 @@
         cursor: pointer;
 
         &:hover {
-            background-color: black;
-            opacity: 0.5;
+            opacity: 0.7;
+            background-color: white;
+
+            &.black {
+                background-color: black;
+            }
         }
     }
 

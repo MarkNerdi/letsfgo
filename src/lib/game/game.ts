@@ -1,4 +1,4 @@
-import { writable, type Writable } from 'svelte/store';
+import { get, writable, type Writable } from 'svelte/store';
 import { FieldState } from './enums';
 import type { BoardState } from './types';
 
@@ -28,5 +28,14 @@ export class Game {
             state[x][y] = stone;
             return state;
         });
+        this.history.update(history => {
+            history.push(`${x},${y}`);
+            return history;
+        });
+    }
+
+    getCurrentColor(): FieldState {
+        const history = get(this.history);
+        return history.length % 2 === 0 ? FieldState.White : FieldState.Black;
     }
 }

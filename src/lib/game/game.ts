@@ -1,6 +1,7 @@
 import { get, writable, type Writable } from 'svelte/store';
 import { FieldState } from './enums';
 import type { BoardState } from './types';
+import sound from '$lib/assets/sounds/vine-boom.mp3';
 
 export class Game {
     public width: number;
@@ -23,7 +24,7 @@ export class Game {
             throw Error;
         }
 
-        new Audio('static/vine-boom.mp3').play();
+        new Audio(sound).play();
 
         console.log(`setStone(${stone}, ${x}, ${y})`);
         

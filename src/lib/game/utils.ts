@@ -1,3 +1,4 @@
+import { FieldState } from '$lib/game/enums';
 import type { BoardState } from '$lib/game/types';
 
 export function getUnitContainingCoordinates(x: number, y: number, board: BoardState, width: number, height: number): { x: number, y: number }[] {
@@ -26,6 +27,35 @@ export function getUnitContainingCoordinates(x: number, y: number, board: BoardS
     getUnitRecursively(x, y);
     return unit;
 }
+
+export function getLibertiesOfUnit(unit: { x: number, y: number }[], board: BoardState, width: number, height: number): { x: number, y: number }[] {
+    const liberties: { x: number, y: number }[] = [];
+    const visited: { [key: string]: boolean } = {};
+
+    function checkStoneRecursively(stone: { x: number, y: number }, index: number) {
+        if (index === unit.length) {
+            return;
+        }
+
+        const adjacentCoordinates = getAdjacentCoordinates(stone.x, stone.y, width, height);
+        adjacentCoordinates.forEach(adjacent => {
+            if (visited[`${adjacent.x},${adjacent.y}`]) {
+                return;
+            }
+
+            visited[`${adjacent.x},${adjacent.y}`] = true;
+            if (board[adjacent.x][adjacent.y] === FieldState.Empty) {
+                liberties.push(adjacent);
+            }
+        });
+
+        checkStoneRecursively(unit[index + 1], index + 1);
+    }
+
+    checkStoneRecursively(unit[0], 0);
+    return liberties;
+}
+
 
 function getAdjacentCoordinates(x: number, y: number, boardWidth: number, boardHeight: number): { x: number, y: number }[] {
     const liberties: { x: number, y: number }[] = [];

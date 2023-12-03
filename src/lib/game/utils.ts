@@ -56,6 +56,44 @@ export function getLibertiesOfUnit(unit: { x: number, y: number }[], board: Boar
     return liberties;
 }
 
+export function getSurroundingUnitsFromUnit(unit: { x: number, y: number }[], board: BoardState, width: number, height: number): { x: number, y: number }[][] {
+    const surroundingStones = getSurroundingStonesFromUnit(unit, board, width, height);
+
+    const surroundingUnits: { x: number, y: number }[][] = surroundingStones.map(stone => getUnitContainingCoordinates(stone.x, stone.y, board, width, height));
+
+    return surroundingUnits;
+}
+
+function getSurroundingStonesFromUnit(unit: { x: number, y: number }[], board: BoardState, width: number, height: number): { x: number, y: number }[] {
+    const stones: { x: number, y: number }[] = [];
+    const visited: { [key: string]: boolean } = {};
+    const color = board[unit[0].x][unit[0].y];
+
+    function checkStoneRecursively(stone: { x: number, y: number }, index: number) {
+        if (index === unit.length) {
+            return;
+        }
+
+        const adjacentCoordinates = getAdjacentCoordinates(stone.x, stone.y, width, height);
+        adjacentCoordinates.forEach(adjacent => {
+            if (visited[`${adjacent.x},${adjacent.y}`]) {
+                return;
+            }
+
+            visited[`${adjacent.x},${adjacent.y}`] = true;
+            if (board[adjacent.x][adjacent.y] === color) {
+                return;
+            }
+
+            stones.push(adjacent);
+        });
+
+        checkStoneRecursively(unit[index + 1], index + 1);
+    }
+
+    checkStoneRecursively(unit[0], 0);
+    return stones;
+}
 
 function getAdjacentCoordinates(x: number, y: number, boardWidth: number, boardHeight: number): { x: number, y: number }[] {
     const liberties: { x: number, y: number }[] = [];

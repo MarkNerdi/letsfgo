@@ -2,6 +2,7 @@ import { get, writable, type Writable } from 'svelte/store';
 import { FieldState } from './enums';
 import type { BoardState } from './types';
 import sound from '$lib/assets/sounds/vine-boom.mp3';
+import { getUnitContainingCoordinates } from '$lib/game/utils';
 
 export class Game {
     public width: number;
@@ -26,8 +27,6 @@ export class Game {
 
         new Audio(sound).play();
 
-        console.log(`setStone(${stone}, ${x}, ${y})`);
-        
         this.state.update(state => {
             state[x][y] = stone;
             return state;
@@ -36,6 +35,10 @@ export class Game {
             history.push(`${x},${y}`);
             return history;
         });
+    }
+
+    getUnitContainingCoordinates(x: number, y: number): { x: number, y: number }[] {
+        return getUnitContainingCoordinates(x, y, get(this.state), this.width, this.height);
     }
 
     getCurrentColor(): FieldState {

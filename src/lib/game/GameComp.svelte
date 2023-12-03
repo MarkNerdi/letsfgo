@@ -20,10 +20,9 @@
         {#each row as field, index2}
             <grid-item>
                 {#if field === FieldState.Empty}
-                    <button
-                        class:black={currentColor === FieldState.Black}
-                        on:click={() => onEmptyClick(index, index2)}
-                    />
+                    <button on:click={() => onEmptyClick(index, index2)}>
+                        <stone class:black={currentColor === FieldState.Black} />
+                    </button>
                 {:else}
                     <stone class:black={field === FieldState.Black} />
                 {/if}
@@ -57,18 +56,22 @@
     }
 
     button {
-        width: 90%;
-        height: 90%;
-        border-radius: 1000px;
-        background-color: transparent;
         cursor: pointer;
+        background-color: transparent;
+
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        stone {
+            opacity: 0;
+        }
 
         &:hover {
-            opacity: 0.7;
-            background-color: white;
-
-            &.black {
-                background-color: black;
+            stone {
+                opacity: 0.6;
             }
         }
     }
@@ -79,9 +82,10 @@
         border-radius: 1000px;
         background-color: white;
         border: 3px solid black;
+        display: block;
 
         &.black {
-        background-color: black;
+            background-color: black;
         }
     }
 </style>

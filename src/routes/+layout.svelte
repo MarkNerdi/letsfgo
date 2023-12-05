@@ -2,7 +2,6 @@
     import { windowWidth } from '$lib/stores/window.store.ts';
     import { onMount } from 'svelte';
     import '$lib/style/global.scss';
-    import { isDesktop } from '$lib/stores/window.store.ts';
     import '$lib/style/global.scss';
 
     onMount(() => {
@@ -11,23 +10,15 @@
     });
 </script>
 
-<div class="app" class:desktop={$isDesktop}>
+<div class="app">
     <slot />
 </div>
 
-<style lang="scss">
+<style lang="postcss">
     .app {
         width: 100%;
         height: 100%;
         display: flex;
         flex-direction: column;
-
-        &.desktop {
-            width: 1000px;
-            height: calc(100% - 100px);
-            margin: auto;
-            margin-top: 50px;
-            overflow: hidden;
-        }
     }
 </style>

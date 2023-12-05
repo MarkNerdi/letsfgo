@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { page } from "$app/stores";
-  import logo from "$lib/assets/images/logo.svg";
+  import { page } from '$app/stores';
+  import logo from '$lib/assets/images/logo.svg';
 </script>
 
 <main class="error-page flex-center">
@@ -12,7 +12,7 @@
   </div>
 </main>
 
-<style lang="scss">
+<style lang="postcss">
   #logo {
     width: 175px;
     height: 175px;

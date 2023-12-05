@@ -3,3 +3,8 @@ export enum FieldState {
     White = 1,
     Black = 2
 }
+
+export enum PlayerColor {
+    White = 1,
+    Black = 2
+}

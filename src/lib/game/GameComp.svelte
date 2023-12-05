@@ -31,10 +31,10 @@
     {/each}
 </game-board>
 
-<style lang="scss">
+<style lang="postcss">
     game-board {
-        @apply bg-[#3e2723];
         @apply p-3 rounded-md;
+        @apply bg-[#3e2723];
 
         display: grid;
         grid-template-rows: auto;
@@ -66,8 +66,8 @@
 
     stone {
         @apply block;
-        @apply w-9/10 h-9/10 rounded-full;
-        @apply border-3 border-solid border-black bg-white;
+        @apply w-5/6 h-5/6 rounded-full;
+        @apply border border-solid border-black bg-white;
 
         &.black {
             @apply bg-black;

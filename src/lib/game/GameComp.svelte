@@ -33,59 +33,44 @@
 
 <style lang="scss">
     game-board {
+        @apply bg-[#3e2723];
+        @apply p-3 rounded-md;
+
         display: grid;
         grid-template-rows: auto;
-
-        background-color: #3e2723;
-        padding: 10px;
-        border-radius: 10px;
-        width: 800px;
         height: 800px;
+        width: 800px;
     }
 
     grid-item {
-        background-color: #b4ede7;
-        border: 2px solid #72615f;
-        box-sizing: border-box;
-
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        @apply bg-[#b4ede7] border border-solid border-[#72615f];
+        @apply w-full h-full box-border;
+        @apply flex justify-center items-center;
     }
 
     button {
-        cursor: pointer;
-        background-color: transparent;
-
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        @apply w-full h-full cursor-pointer;
+        @apply flex justify-center items-center;
+        @apply bg-transparent;        
 
         stone {
-            opacity: 0;
+            @apply opacity-0;
         }
 
         &:hover {
             stone {
-                opacity: 0.6;
+                @apply opacity-60;
             }
         }
     }
 
     stone {
-        width: 90%;
-        height: 90%;
-        border-radius: 1000px;
-        background-color: white;
-        border: 3px solid black;
-        display: block;
+        @apply block;
+        @apply w-9/10 h-9/10 rounded-full;
+        @apply border-3 border-solid border-black bg-white;
 
         &.black {
-            background-color: black;
+            @apply bg-black;
         }
     }
 </style>

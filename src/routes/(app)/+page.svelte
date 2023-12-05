@@ -23,10 +23,7 @@
 
 <style lang="scss">
     game-container {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        @apply w-full h-full;
+        @apply flex justify-center items-center;
     }
 </style>

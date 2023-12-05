@@ -14,12 +14,12 @@
 
 <style lang="postcss">
     player-info {
-        @apply flex flex-row justify-center items-center;
+        @apply flex flex-row justify-center items-center gap-2;
     }
 
     stone {
         @apply block;
-        @apply w-9/10 h-9/10 rounded-full;
+        @apply w-[30px] h-[30px] rounded-full;
         @apply border border-solid border-black bg-white;
 
         &.black {

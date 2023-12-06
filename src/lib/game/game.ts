@@ -1,5 +1,5 @@
 import { derived, get, writable, type Writable, type Readable } from 'svelte/store';
-import { FieldState } from './enums';
+import { FieldState, GameStatus } from './enums';
 import type { BoardState } from './types';
 import sound from '$lib/assets/sounds/vine-boom.mp3';
 import { getLibertiesOfUnit, getSurroundingUnitsFromUnit, getUnitContainingCoordinates } from '$lib/game/utils';
@@ -7,6 +7,7 @@ import { getLibertiesOfUnit, getSurroundingUnitsFromUnit, getUnitContainingCoord
 export class Game {
     public width: number;
     public height: number;
+    public status: Writable<GameStatus>;
     public boardState: Writable<BoardState>;
     public history: Writable<string[]>;
     public currentPlayer: Readable<FieldState>;
@@ -19,14 +20,19 @@ export class Game {
             return Array.from({ length: width }, () => FieldState.Empty);
         })); 
         this.history = writable([]);
-        this.currentPlayer = derived([this.history], history => {
+        this.currentPlayer = derived([this.history], ([history]) => {
             return history.length % 2 === 0 ? FieldState.Black : FieldState.White;
         });
+        this.status = writable(GameStatus.NotStarted);
     }
 
     setStone(stone: FieldState, x: number, y: number): void {
         if (x >= this.width || x < 0 || y >= this.height || y < 0) {
             throw Error;
+        }
+
+        if (get(this.history).length === 0) {
+            this.status.set(GameStatus.InProgress);
         }
         
         this.history.update(history => {

@@ -8,3 +8,9 @@ export enum PlayerColor {
     White = 1,
     Black = 2
 }
+
+export enum GameStatus {
+    NotStarted,
+    InProgress,
+    Ended
+}

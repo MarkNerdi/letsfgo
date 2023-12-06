@@ -1,14 +1,16 @@
 <script lang="ts">
     import PlayerInfo from '$lib/components/PlayerInfo.svelte';
     import GameComp from '$lib/game/GameComp.svelte';
-    import { PlayerColor } from '$lib/game/enums';
+    import { GameStatus, PlayerColor } from '$lib/game/enums';
     import { Game } from '$lib/game/game';
 
-    let game: Game = new Game(9, 9);
+    let game: Game | undefined = undefined;
 
     function startNewGame(): void {
         game = new Game(9, 9);
     }
+
+    $: status = game?.status;
 </script>
 
 <play-view>
@@ -32,13 +34,21 @@
 
 
   <controlls-container>
-        {#if game && game.state !== 'finished'}
-        <div class="flex flex-row gap-4">
-            <button on:click={startNewGame}>Takeback</button>
-            <button on:click={startNewGame}>Surrender</button>
-        </div>
+        {#if game && $status !== GameStatus.Ended}
+        <button-container>
+            <button on:click={() => {
+                console.log('clicked');
+            }}>
+                Takeback
+            </button>
+            <button on:click={() => {
+                console.log('clicked');
+            }}>
+                Surrender
+            </button>
+        </button-container>
         {:else}
-            <button on:click={startNewGame}>Lets GOOOOOO</button>
+            <button class="primary" on:click={startNewGame}>Lets GOOOOOO</button>
         {/if}
   </controlls-container>
 </play-view>
@@ -56,7 +66,7 @@
 
     game-container {
         @apply h-full w-[800px];
-        @apply flex flex-col justify-center items-center gap-2;
+        @apply flex flex-col justify-between items-center gap-2;
     }
 
     controlls-container {
@@ -65,8 +75,17 @@
         @apply bg-gray-300;
     }
 
+    button-container {
+        @apply w-full;
+        @apply flex flex-row justify-between items-center gap-4;
+    }
+
     button {
         @apply w-full h-16 rounded-md;
-        @apply bg-green-500 text-white cursor-pointer;
+        @apply bg-gray-500 text-white cursor-pointer;
+
+        &.primary {
+            @apply bg-blue-500;
+        }
     }
 </style>

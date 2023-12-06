@@ -4,14 +4,11 @@
 
     export let game: Game;
 
-    let gameState = game.state;
-    let history = game.history;
-    let currentColor: FieldState = game.getCurrentColor();
-
-    $: $history, currentColor = game.getCurrentColor();
+    $: gameState = game.boardState;
+    $: currentPlayer = game.currentPlayer;
 
     function onEmptyClick(x: number, y: number): void {
-        game.setStone(currentColor, x, y);
+        game.setStone($currentPlayer, x, y);
     }   
 </script>
 
@@ -21,7 +18,7 @@
             <grid-item>
                 {#if field === FieldState.Empty}
                     <button on:click={() => onEmptyClick(index, index2)}>
-                        <stone class:black={currentColor === FieldState.Black} />
+                        <stone class:black={$currentPlayer === FieldState.Black} />
                     </button>
                 {:else}
                     <stone class:black={field === FieldState.Black} />

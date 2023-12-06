@@ -1,4 +1,4 @@
-import { get, writable, type Writable } from 'svelte/store';
+import { derived, get, writable, type Writable, type Readable } from 'svelte/store';
 import { FieldState } from './enums';
 import type { BoardState } from './types';
 import sound from '$lib/assets/sounds/vine-boom.mp3';
@@ -7,17 +7,21 @@ import { getLibertiesOfUnit, getSurroundingUnitsFromUnit, getUnitContainingCoord
 export class Game {
     public width: number;
     public height: number;
-    public state: Writable<BoardState>;
+    public boardState: Writable<BoardState>;
     public history: Writable<string[]>;
+    public currentPlayer: Readable<FieldState>;
 
     constructor(width: number, height: number) {
         this.width = width;
         this.height = height;
 
-        this.state = writable(Array.from({ length: height }, ()=> {
+        this.boardState = writable(Array.from({ length: height }, ()=> {
             return Array.from({ length: width }, () => FieldState.Empty);
         })); 
         this.history = writable([]);
+        this.currentPlayer = derived([this.history], history => {
+            return history.length % 2 === 0 ? FieldState.Black : FieldState.White;
+        });
     }
 
     setStone(stone: FieldState, x: number, y: number): void {
@@ -25,12 +29,11 @@ export class Game {
             throw Error;
         }
         
-
         this.history.update(history => {
             history.push(`${x},${y}`);
             return history;
         });
-        this.state.update(state => {
+        this.boardState.update(state => {
             state[x][y] = stone;
             return state;
         });
@@ -62,7 +65,7 @@ export class Game {
     }
 
     removeUnit(unit: { x: number, y: number }[]): void {
-        this.state.update(state => {
+        this.boardState.update(state => {
             unit.forEach(stone => {
                 state[stone.x][stone.y] = FieldState.Empty;
             });
@@ -71,19 +74,14 @@ export class Game {
     }
 
     getSurroundingUnitsFromUnit(unit: { x: number, y: number }[]): { x: number, y: number }[][] {
-        return getSurroundingUnitsFromUnit(unit, get(this.state), this.width, this.height);
+        return getSurroundingUnitsFromUnit(unit, get(this.boardState), this.width, this.height);
     }
 
     getUnitContainingCoordinates(x: number, y: number): { x: number, y: number }[] {
-        return getUnitContainingCoordinates(x, y, get(this.state), this.width, this.height);
+        return getUnitContainingCoordinates(x, y, get(this.boardState), this.width, this.height);
     }
 
     getLibertiesOfUnit(unit: { x: number, y: number }[]): { x: number, y: number }[] {
-        return getLibertiesOfUnit(unit, get(this.state), this.width, this.height);
-    }
-
-    getCurrentColor(): FieldState {
-        const history = get(this.history);
-        return history.length % 2 === 0 ? FieldState.White : FieldState.Black;
+        return getLibertiesOfUnit(unit, get(this.boardState), this.width, this.height);
     }
 }

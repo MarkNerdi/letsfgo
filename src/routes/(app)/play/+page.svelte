@@ -19,7 +19,9 @@
             03: 03
         </div>
     </player-section>
-    <GameComp bind:game />
+    {#if game}
+         <GameComp bind:game />
+    {/if}
     <player-section>
         <PlayerInfo color={PlayerColor.White} name="Player 1" rank="1d" />
         <div >
@@ -30,15 +32,21 @@
 
 
   <controlls-container>
-      <button on:click={startNewGame}>Lets GOOOOOO</button>
-
+        {#if game && game.state !== 'finished'}
+        <div class="flex flex-row gap-4">
+            <button on:click={startNewGame}>Takeback</button>
+            <button on:click={startNewGame}>Surrender</button>
+        </div>
+        {:else}
+            <button on:click={startNewGame}>Lets GOOOOOO</button>
+        {/if}
   </controlls-container>
 </play-view>
 
 <style lang="postcss">
     play-view {
         @apply w-full h-full;
-        @apply flex justify-center items-center;
+        @apply flex justify-center items-center gap-4;
     }
 
     player-section {
@@ -47,7 +55,18 @@
     }
 
     game-container {
-        @apply h-full w-[800px];;
+        @apply h-full w-[800px];
         @apply flex flex-col justify-center items-center gap-2;
+    }
+
+    controlls-container {
+        @apply w-[500px] h-full p-8;
+        @apply flex flex-col justify-center items-center gap-2;
+        @apply bg-gray-300;
+    }
+
+    button {
+        @apply w-full h-16 rounded-md;
+        @apply bg-green-500 text-white cursor-pointer;
     }
 </style>

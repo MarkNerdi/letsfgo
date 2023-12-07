@@ -3,6 +3,7 @@
     import { FieldState } from './enums';
 
     export let game: Game;
+    export let color: 'burlywood' | 'white' = 'burlywood';
 
     $: gameState = game.boardState;
     $: currentPlayer = game.currentPlayer;
@@ -12,7 +13,7 @@
     }   
 </script>
 
-<game>
+<game class:burlywood={color === 'burlywood'}>
     <game-board style={`grid-template-columns: repeat(${game.width}, 1fr)`}>
         {#each $gameState as row, index}
             {#each row as field, index2}
@@ -34,18 +35,23 @@
     game {
         @apply flex justify-center items-center gap-4;
         @apply h-[800px] w-[800px] p-16 rounded-xl;
-        @apply bg-gray-100;
+        @apply border border-solid border-gray-500;
+        @apply bg-white;
+
+        &.burlywood {
+            @apply bg-[burlywood];
+        }
     }
 
     game-board {
         @apply w-full h-full;
-        @apply border border-solid border-[#72615f];
+        @apply border border-solid border-gray-500;
         display: grid;
         grid-template-rows: auto;
     }
 
     grid-item {
-        @apply bg-[#b4ede7] border border-solid border-[#72615f];
+        @apply  border border-solid border-gray-500;
         @apply w-full h-full box-border;
         @apply flex justify-center items-center;
     }
@@ -69,7 +75,7 @@
     stone {
         @apply block;
         @apply w-5/6 h-5/6 rounded-full;
-        @apply border border-solid border-black bg-white;
+        @apply border-2 border-solid border-black bg-white;
 
         &.black {
             @apply bg-black;

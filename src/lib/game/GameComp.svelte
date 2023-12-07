@@ -12,31 +12,36 @@
     }   
 </script>
 
-<game-board style={`grid-template-columns: repeat(${game.width}, 1fr)`}>
-    {#each $gameState as row, index}
-        {#each row as field, index2}
-            <grid-item>
-                {#if field === FieldState.Empty}
-                    <button on:click={() => onEmptyClick(index, index2)}>
-                        <stone class:black={$currentPlayer === FieldState.Black} />
-                    </button>
-                {:else}
-                    <stone class:black={field === FieldState.Black} />
-                {/if}
-            </grid-item>
+<game>
+    <game-board style={`grid-template-columns: repeat(${game.width}, 1fr)`}>
+        {#each $gameState as row, index}
+            {#each row as field, index2}
+                <grid-item>
+                    {#if field === FieldState.Empty}
+                        <button on:click={() => onEmptyClick(index, index2)}>
+                            <stone class:black={$currentPlayer === FieldState.Black} />
+                        </button>
+                    {:else}
+                        <stone class:black={field === FieldState.Black} />
+                    {/if}
+                </grid-item>
+            {/each}
         {/each}
-    {/each}
-</game-board>
+    </game-board>
+</game>
 
 <style lang="postcss">
-    game-board {
-        @apply p-3 rounded-md;
-        @apply bg-[#3e2723];
+    game {
+        @apply flex justify-center items-center gap-4;
+        @apply h-[800px] w-[800px] p-16 rounded-xl;
+        @apply bg-gray-100;
+    }
 
+    game-board {
+        @apply w-full h-full;
+        @apply border border-solid border-[#72615f];
         display: grid;
         grid-template-rows: auto;
-        height: 800px;
-        width: 800px;
     }
 
     grid-item {

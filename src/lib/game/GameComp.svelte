@@ -1,58 +1,38 @@
 <script lang="ts">
-    import type { Game } from '$lib/game/game';
+    import EmptyBoard from '$lib/game/EmptyBoard.svelte';
+import type { Game } from '$lib/game/game';
     import { FieldState } from './enums';
 
-    export let game: Game;
-    export let color: 'burlywood' | 'white' = 'burlywood';
+    export let game: Game | undefined;
+    export let color: 'burlywood' | 'white' = 'white';
 
-    $: gameState = game.boardState;
-    $: currentPlayer = game.currentPlayer;
+    $: gameState = game?.boardState;
+    $: currentPlayer = game?.currentPlayer;
 
     function onEmptyClick(x: number, y: number): void {
+        if (!game || !currentPlayer) return;
         game.setStone($currentPlayer, x, y);
     }   
 </script>
 
-<game class:burlywood={color === 'burlywood'}>
-    <game-board style={`grid-template-columns: repeat(${game.width}, 1fr)`}>
-        {#each $gameState as row, index}
-            {#each row as field, index2}
-                <grid-item>
-                    {#if field === FieldState.Empty}
-                        <button on:click={() => onEmptyClick(index, index2)}>
-                            <stone class:black={$currentPlayer === FieldState.Black} />
-                        </button>
-                    {:else}
-                        <stone class:black={field === FieldState.Black} />
-                    {/if}
-                </grid-item>
-            {/each}
-        {/each}
-    </game-board>
-</game>
+<EmptyBoard width={game?.width} height={game?.height} {color} let:index let:index2>
+    <grid-item slot="field" class="h-full w-full">
+        {#if !gameState || !$gameState}
+            <!-- empty -->
+        {:else if $gameState[index][index2] === FieldState.Empty}
+            <button on:click={() => onEmptyClick(index, index2)}>
+                <stone class:black={$currentPlayer === FieldState.Black} />
+            </button>
+        {:else}
+            <stone class:black={$gameState[index][index2] === FieldState.Black} />
+        {/if}
+    </grid-item>
+</EmptyBoard>
 
 <style lang="postcss">
-    game {
-        @apply flex justify-center items-center gap-4;
-        @apply h-[800px] w-[800px] p-16 rounded-xl;
-        @apply border border-solid border-gray-500;
-        @apply bg-white;
-
-        &.burlywood {
-            @apply bg-[burlywood];
-        }
-    }
-
-    game-board {
-        @apply w-full h-full;
-        @apply border border-solid border-gray-500;
-        display: grid;
-        grid-template-rows: auto;
-    }
 
     grid-item {
-        @apply  border border-solid border-gray-500;
-        @apply w-full h-full box-border;
+        @apply w-full h-full;
         @apply flex justify-center items-center;
     }
 

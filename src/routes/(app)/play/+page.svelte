@@ -21,9 +21,7 @@
             03: 03
         </div>
     </player-section>
-    {#if game}
-         <GameComp bind:game />
-    {/if}
+    <GameComp bind:game />
     <player-section>
         <PlayerInfo color={PlayerColor.White} name="Player 1" rank="1d" />
         <div >
@@ -66,7 +64,7 @@
 
     game-container {
         @apply h-full w-[800px];
-        @apply flex flex-col justify-between items-center gap-2;
+        @apply flex flex-col justify-center items-center gap-2;
     }
 
     controlls-container {

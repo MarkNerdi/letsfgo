@@ -26,6 +26,22 @@ export class Game {
         this.status = writable(GameStatus.NotStarted);
     }
 
+    pass(): void {
+        if (get(this.history).length === 0) {
+            this.status.set(GameStatus.InProgress);
+        }
+
+        this.history.update(history => {
+            history.push('pass');
+            return history;
+        });
+
+        const [secondLast, last] = get(this.history).slice(-2);
+        if (secondLast === 'pass' && last === 'pass') {
+            this.status.set(GameStatus.Ended);
+        }
+    }
+
     setStone(stone: FieldState, x: number, y: number): void {
         if (x >= this.width || x < 0 || y >= this.height || y < 0) {
             throw Error;
@@ -68,6 +84,10 @@ export class Game {
         if (!didCaptureSomething && liberties.length === 0) {
             this.removeUnit(unit);
         }
+    }
+
+    getWinner(): FieldState {
+        return FieldState.Black;
     }
 
     removeUnit(unit: { x: number, y: number }[]): void {

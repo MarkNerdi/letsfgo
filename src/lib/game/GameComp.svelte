@@ -1,13 +1,14 @@
 <script lang="ts">
     import EmptyBoard from '$lib/game/EmptyBoard.svelte';
-import type { Game } from '$lib/game/game';
-    import { FieldState } from './enums';
+    import type { Game } from '$lib/game/game';
+    import { FieldState, GameStatus } from './enums';
 
     export let game: Game | undefined;
     export let color: 'burlywood' | 'white' = 'white';
 
-    $: gameState = game?.boardState;
+    $: boardState = game?.boardState;
     $: currentPlayer = game?.currentPlayer;
+    $: gameStatus = game?.status;
 
     function onEmptyClick(x: number, y: number): void {
         if (!game || !currentPlayer) return;
@@ -17,14 +18,18 @@ import type { Game } from '$lib/game/game';
 
 <EmptyBoard width={game?.width} height={game?.height} {color} let:index let:index2>
     <grid-item slot="field" class="h-full w-full">
-        {#if !gameState || !$gameState}
+        {#if !boardState || !$boardState}
             <!-- empty -->
-        {:else if $gameState[index][index2] === FieldState.Empty}
-            <button on:click={() => onEmptyClick(index, index2)}>
-                <stone class:black={$currentPlayer === FieldState.Black} />
-            </button>
+        {:else if $boardState[index][index2] === FieldState.Empty }
+            {#if $gameStatus === GameStatus.Ended}
+                <!-- empty -->
+            {:else}
+                <button on:click={() => onEmptyClick(index, index2)}>
+                    <stone class:black={$currentPlayer === FieldState.Black} />
+                </button>
+            {/if}
         {:else}
-            <stone class:black={$gameState[index][index2] === FieldState.Black} />
+            <stone class:black={$boardState[index][index2] === FieldState.Black} />
         {/if}
     </grid-item>
 </EmptyBoard>

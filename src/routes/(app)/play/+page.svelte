@@ -11,6 +11,7 @@
     }
 
     $: status = game?.status;
+    $: currentPlayer = game?.currentPlayer;
 </script>
 
 <play-view>
@@ -30,21 +31,30 @@
     </player-section>
   </game-container>
 
-
   <controlls-container>
+        {#if game && $status === GameStatus.Ended}
+            <h2>
+                {game.getWinner()} won!
+            </h2>
+        {/if}
         {#if game && $status !== GameStatus.Ended}
-        <button-container>
-            <button on:click={() => {
-                console.log('clicked');
-            }}>
-                Takeback
-            </button>
-            <button on:click={() => {
-                console.log('clicked');
-            }}>
-                Surrender
-            </button>
-        </button-container>
+            <button-container>
+                <button on:click={() => {
+                    console.log('clicked');
+                }}>
+                    Takeback
+                </button>
+                <button on:click={() => {
+                    console.log('clicked');
+                }}>
+                    Surrender
+                </button>
+                <button on:click={() => {
+                    game?.pass($currentPlayer);
+                }}>
+                    Pass
+                </button>
+            </button-container>
         {:else}
             <button class="primary" on:click={startNewGame}>Lets GOOOOOO</button>
         {/if}

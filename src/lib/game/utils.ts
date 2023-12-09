@@ -61,7 +61,15 @@ export function getSurroundingUnitsFromUnit(unit: { x: number, y: number }[], bo
 
     const surroundingUnits: { x: number, y: number }[][] = surroundingStones.map(stone => getUnitContainingCoordinates(stone.x, stone.y, board, width, height));
 
-    return surroundingUnits;
+    const uniqueSurroundingUnits: { x: number, y: number }[][] = [];
+    surroundingUnits.forEach(unit => {
+        if (uniqueSurroundingUnits.some(uniqueUnit => uniqueUnit.some((stone) => stone.x === unit[0].x && stone.y === unit[0].y))) {
+            return;
+        }
+        uniqueSurroundingUnits.push(unit);
+    });
+
+    return uniqueSurroundingUnits;
 }
 
 function getSurroundingStonesFromUnit(unit: { x: number, y: number }[], board: BoardState, width: number, height: number): { x: number, y: number }[] {
@@ -73,7 +81,6 @@ function getSurroundingStonesFromUnit(unit: { x: number, y: number }[], board: B
         if (index === unit.length) {
             return;
         }
-
         const adjacentCoordinates = getAdjacentCoordinates(stone.x, stone.y, width, height);
         adjacentCoordinates.forEach(adjacent => {
             if (visited[`${adjacent.x},${adjacent.y}`]) {
@@ -81,7 +88,7 @@ function getSurroundingStonesFromUnit(unit: { x: number, y: number }[], board: B
             }
 
             visited[`${adjacent.x},${adjacent.y}`] = true;
-            if (board[adjacent.x][adjacent.y] === color) {
+            if (board[adjacent.x][adjacent.y] === color || board[adjacent.x][adjacent.y] === FieldState.Empty) {
                 return;
             }
 

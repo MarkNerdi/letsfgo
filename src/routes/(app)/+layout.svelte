@@ -15,17 +15,13 @@
 
 <style lang="postcss">
     header {
-        width: 100%;
-        height: 75px;
-        display: flex;
-        justify-content: start;
-        align-items: center;
-        gap: 20px;
+        @apply h-[75px];
+        @apply flex justify-start items-center gap-4;
+        @apply bg-white;
+        @apply  border-solid border-gray-200;
     }
 
-    
     .page-container {
-        height: 100%;
-        overflow: hidden;
+        @apply w-full h-full;
     }
 </style>

@@ -8,14 +8,14 @@
 </header>
 
 <div class="page-container">
-    <main class="padding">
+    <main class="p-5">
         <slot />
     </main>
 </div>
 
 <style lang="postcss">
     header {
-        @apply h-[75px];
+        @apply h-[70px];
         @apply flex justify-start items-center gap-4;
         @apply bg-white;
         @apply border-b border-solid border-gray-200;

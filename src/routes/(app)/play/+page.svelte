@@ -1,5 +1,6 @@
 <script lang="ts">
-    import PlayerInfo from '$lib/components/PlayerInfo.svelte';
+    import HistoryOverview from '$lib/components/HistoryOverview.svelte';
+import PlayerInfo from '$lib/components/PlayerInfo.svelte';
     import GameComp from '$lib/game/GameComp.svelte';
     import { GameStatus, PlayerColor } from '$lib/game/enums';
     import { Game } from '$lib/game/game';
@@ -11,6 +12,7 @@
     }
 
     $: status = game?.status;
+    $: history = game?.history;
     $: currentPlayer = game?.currentPlayer;
 </script>
 
@@ -40,9 +42,8 @@
                 <div>23.03.2023</div>
             </game-info>
             <history-container>
-                <div>History</div>
+                <HistoryOverview history={$history} />
             </history-container>
-            
 
             {#if $status !== GameStatus.Ended}
                 <controlls>
@@ -137,6 +138,7 @@
     }
 
     history-container {
+        @apply flex-grow max-h-40 overflow-y-auto;
     }
 
     controlls {

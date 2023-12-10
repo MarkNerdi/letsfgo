@@ -11,3 +11,9 @@ export async function share(title: string, link: string = window.location.href) 
 export function goBack() {
     history.back();
 }
+
+export function playSound(sound: string, volume = 0.1) {
+    const audio = new Audio(sound);
+    audio.volume = volume;
+    audio.play();
+}

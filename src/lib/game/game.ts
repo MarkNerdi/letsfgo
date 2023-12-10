@@ -4,6 +4,7 @@ import type { BoardState } from './types';
 import sound from '$lib/assets/sounds/vine-boom.mp3';
 import { getLibertiesOfUnit, getSurroundingUnitsFromUnit, getUnitContainingCoordinates } from '$lib/game/utils';
 import { getAreaScoring } from '$lib/game/scorings';
+import { playSound } from '$lib/utils';
 
 export class Game {
     public width: number;
@@ -70,7 +71,7 @@ export class Game {
 
             const isAtari = adjacentLiberties.length === 1;
             if (isAtari) {
-                new Audio(sound).play();
+                playSound(sound);
             }
 
             const isCapture = adjacentLiberties.length === 0;

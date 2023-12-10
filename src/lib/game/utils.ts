@@ -1,7 +1,7 @@
 import { FieldState } from '$lib/game/enums';
 import type { BoardState } from '$lib/game/types';
 
-export function getUnitContainingCoordinates(x: number, y: number, board: BoardState, width: number, height: number): { x: number, y: number }[] {
+export function getUnitContainingCoordinates(x: number, y: number, board: BoardState): { x: number, y: number }[] {
     const unit: { x: number, y: number }[] = [];
     const visited: { [key: string]: boolean } = {};
     const color = board[x][y];
@@ -18,7 +18,7 @@ export function getUnitContainingCoordinates(x: number, y: number, board: BoardS
 
         unit.push({ x: currentX, y: currentY });
         
-        const adjacentCoordinates = getAdjacentCoordinates(currentX, currentY, width, height);
+        const adjacentCoordinates = getAdjacentCoordinates(currentX, currentY, board);
         adjacentCoordinates.forEach(adjacent => {
             getUnitRecursively(adjacent.x, adjacent.y);
         });
@@ -28,7 +28,7 @@ export function getUnitContainingCoordinates(x: number, y: number, board: BoardS
     return unit;
 }
 
-export function getLibertiesOfUnit(unit: { x: number, y: number }[], board: BoardState, width: number, height: number): { x: number, y: number }[] {
+export function getLibertiesOfUnit(unit: { x: number, y: number }[], board: BoardState): { x: number, y: number }[] {
     const liberties: { x: number, y: number }[] = [];
     const visited: { [key: string]: boolean } = {};
 
@@ -37,7 +37,7 @@ export function getLibertiesOfUnit(unit: { x: number, y: number }[], board: Boar
             return;
         }
 
-        const adjacentCoordinates = getAdjacentCoordinates(stone.x, stone.y, width, height);
+        const adjacentCoordinates = getAdjacentCoordinates(stone.x, stone.y, board);
         adjacentCoordinates.forEach(adjacent => {
             if (visited[`${adjacent.x},${adjacent.y}`]) {
                 return;
@@ -56,10 +56,10 @@ export function getLibertiesOfUnit(unit: { x: number, y: number }[], board: Boar
     return liberties;
 }
 
-export function getSurroundingUnitsFromUnit(unit: { x: number, y: number }[], board: BoardState, width: number, height: number): { x: number, y: number }[][] {
-    const surroundingStones = getSurroundingStonesFromUnit(unit, board, width, height);
+export function getSurroundingUnitsFromUnit(unit: { x: number, y: number }[], board: BoardState): { x: number, y: number }[][] {
+    const surroundingStones = getSurroundingStonesFromUnit(unit, board);
 
-    const surroundingUnits: { x: number, y: number }[][] = surroundingStones.map(stone => getUnitContainingCoordinates(stone.x, stone.y, board, width, height));
+    const surroundingUnits: { x: number, y: number }[][] = surroundingStones.map(stone => getUnitContainingCoordinates(stone.x, stone.y, board));
 
     const uniqueSurroundingUnits: { x: number, y: number }[][] = [];
     surroundingUnits.forEach(unit => {
@@ -72,7 +72,7 @@ export function getSurroundingUnitsFromUnit(unit: { x: number, y: number }[], bo
     return uniqueSurroundingUnits;
 }
 
-export function getSurroundingStonesFromUnit(unit: { x: number, y: number }[], board: BoardState, width: number, height: number): { x: number, y: number }[] {
+export function getSurroundingStonesFromUnit(unit: { x: number, y: number }[], board: BoardState): { x: number, y: number }[] {
     const stones: { x: number, y: number }[] = [];
     const visited: { [key: string]: boolean } = {};
     const color = board[unit[0].x][unit[0].y];
@@ -81,7 +81,7 @@ export function getSurroundingStonesFromUnit(unit: { x: number, y: number }[], b
         if (index === unit.length) {
             return;
         }
-        const adjacentCoordinates = getAdjacentCoordinates(stone.x, stone.y, width, height);
+        const adjacentCoordinates = getAdjacentCoordinates(stone.x, stone.y, board);
         adjacentCoordinates.forEach(adjacent => {
             if (visited[`${adjacent.x},${adjacent.y}`]) {
                 return;
@@ -102,19 +102,27 @@ export function getSurroundingStonesFromUnit(unit: { x: number, y: number }[], b
     return stones;
 }
 
-function getAdjacentCoordinates(x: number, y: number, boardWidth: number, boardHeight: number): { x: number, y: number }[] {
+function getAdjacentCoordinates(x: number, y: number, board: BoardState): { x: number, y: number }[] {
     const liberties: { x: number, y: number }[] = [];
+    const { width, height } = getDimensionsFromBoardState(board);
     if (x > 0) {
         liberties.push({ x: x - 1, y });
     }
-    if (x < boardWidth - 1) {
+    if (x < width - 1) {
         liberties.push({ x: x + 1, y });
     }
     if (y > 0) {
         liberties.push({ x, y: y - 1 });
     }
-    if (y < boardHeight - 1) {
+    if (y < height - 1) {
         liberties.push({ x, y: y + 1 });
     }
     return liberties;
+}
+
+export function getDimensionsFromBoardState(board: BoardState): { width: number, height: number } {
+    return {
+        width: board.length,
+        height: board[0].length,
+    };
 }

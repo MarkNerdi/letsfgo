@@ -88,7 +88,7 @@ export class Game {
     }
 
     getFinalScore(): { black: number, white: number } {
-        return getAreaScoring(get(this.boardState), this.width, this.height);
+        return getAreaScoring(get(this.boardState));
     }
 
     getWinner(): FieldState {
@@ -106,14 +106,14 @@ export class Game {
     }
 
     getSurroundingUnitsFromUnit(unit: { x: number, y: number }[]): { x: number, y: number }[][] {
-        return getSurroundingUnitsFromUnit(unit, get(this.boardState), this.width, this.height);
+        return getSurroundingUnitsFromUnit(unit, get(this.boardState));
     }
 
     getUnitContainingCoordinates(x: number, y: number): { x: number, y: number }[] {
-        return getUnitContainingCoordinates(x, y, get(this.boardState), this.width, this.height);
+        return getUnitContainingCoordinates(x, y, get(this.boardState));
     }
 
     getLibertiesOfUnit(unit: { x: number, y: number }[]): { x: number, y: number }[] {
-        return getLibertiesOfUnit(unit, get(this.boardState), this.width, this.height);
+        return getLibertiesOfUnit(unit, get(this.boardState));
     }
 }

@@ -1,11 +1,13 @@
 import { FieldState } from '$lib/game/enums';
 import type { BoardState } from '$lib/game/types';
-import { getSurroundingStonesFromUnit, getUnitContainingCoordinates } from '$lib/game/utils';
+import { getDimensionsFromBoardState, getSurroundingStonesFromUnit, getUnitContainingCoordinates } from '$lib/game/utils';
 
-export function getAreaScoring(boardState: BoardState, width: number, height: number): { black: number, white: number } {
+export function getAreaScoring(boardState: BoardState): { black: number, white: number } {
+    const { width, height } = getDimensionsFromBoardState(boardState);
     const colorForField: (FieldState | undefined)[][] = Array.from({ length: height }, ()=> {
         return Array.from({ length: width }, () => undefined);
     });
+
 
     for (const [index, row] of boardState.entries()) {
         for (const [index2, field] of row.entries()) {
@@ -14,8 +16,8 @@ export function getAreaScoring(boardState: BoardState, width: number, height: nu
             }
 
             if (field === FieldState.Empty) {
-                const unit = getUnitContainingCoordinates(index, index2, boardState, width, height);
-                const surroundingStones = getSurroundingStonesFromUnit(unit, boardState, width, height);
+                const unit = getUnitContainingCoordinates(index, index2, boardState);
+                const surroundingStones = getSurroundingStonesFromUnit(unit, boardState);
                 const surroundingColors = [...new Set(surroundingStones.map(stone => boardState[stone.x][stone.y]))];
 
                 unit.forEach(stone => colorForField[stone.x][stone.y] = surroundingColors.length === 1 ? surroundingColors[0] : FieldState.Empty);

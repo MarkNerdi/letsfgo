@@ -60,9 +60,9 @@ import PlayerInfo from '$lib/components/PlayerInfo.svelte';
                             Takeback
                         </button>
                         <button on:click={() => {
-                            console.log('clicked');
+                            game?.surrender();
                         }}>
-                            Surrender
+                            Resign
                         </button>
                     </div>
                 </controlls>

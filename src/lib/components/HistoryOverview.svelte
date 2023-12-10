@@ -1,8 +1,10 @@
 <script lang="ts">
     export let history: string[] = [];
 
+    const keyWords = ['pass', 'resign'];
+
     $: formattedHistory = history.map(item => {
-        if (item === 'pass') return 'pass';
+        if (keyWords.includes(item)) return item;
         const [x, y] = item.split(',').map((item) => parseInt(item));
         return `${String.fromCharCode(x + 97).toUpperCase()}${y + 1}`;
     });

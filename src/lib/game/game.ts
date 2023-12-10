@@ -28,22 +28,6 @@ export class Game {
         this.status = writable(GameStatus.NotStarted);
     }
 
-    pass(): void {
-        if (get(this.history).length === 0) {
-            this.status.set(GameStatus.InProgress);
-        }
-
-        this.history.update(history => {
-            history.push('pass');
-            return history;
-        });
-
-        const [secondLast, last] = get(this.history).slice(-2);
-        if (secondLast === 'pass' && last === 'pass') {
-            this.status.set(GameStatus.Ended);
-        }
-    }
-
     setStone(stone: FieldState, x: number, y: number): void {
         if (x >= this.width || x < 0 || y >= this.height || y < 0) {
             throw Error;
@@ -86,6 +70,31 @@ export class Game {
         if (!didCaptureSomething && liberties.length === 0) {
             this.removeUnit(unit);
         }
+    }
+
+    pass(): void {
+        if (get(this.history).length === 0) {
+            this.status.set(GameStatus.InProgress);
+        }
+
+        this.history.update(history => {
+            history.push('pass');
+            return history;
+        });
+
+        const [secondLast, last] = get(this.history).slice(-2);
+        if (secondLast === 'pass' && last === 'pass') {
+            this.status.set(GameStatus.Ended);
+        }
+    }
+
+    surrender(): void {
+        this.status.set(GameStatus.Ended);
+
+        this.history.update(history => {
+            history.push('resign');
+            return history;
+        });
     }
 
     getFinalScore(): { black: number, white: number } {

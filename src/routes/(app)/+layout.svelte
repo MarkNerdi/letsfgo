@@ -18,7 +18,7 @@
         @apply h-[75px];
         @apply flex justify-start items-center gap-4;
         @apply bg-white;
-        @apply  border-solid border-gray-200;
+        @apply border-b border-solid border-gray-200;
     }
 
     .page-container {

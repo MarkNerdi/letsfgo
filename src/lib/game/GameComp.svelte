@@ -20,7 +20,7 @@
     <grid-item slot="field" class="h-full w-full">
         {#if !boardState || !$boardState}
             <!-- empty -->
-        {:else if $boardState[index][index2] === FieldState.Empty }
+        {:else if $boardState[index][index2] === FieldState.Empty}
             {#if $gameStatus === GameStatus.Ended}
                 <!-- empty -->
             {:else}

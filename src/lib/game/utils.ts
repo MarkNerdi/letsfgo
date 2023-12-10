@@ -72,7 +72,7 @@ export function getSurroundingUnitsFromUnit(unit: { x: number, y: number }[], bo
     return uniqueSurroundingUnits;
 }
 
-function getSurroundingStonesFromUnit(unit: { x: number, y: number }[], board: BoardState, width: number, height: number): { x: number, y: number }[] {
+export function getSurroundingStonesFromUnit(unit: { x: number, y: number }[], board: BoardState, width: number, height: number): { x: number, y: number }[] {
     const stones: { x: number, y: number }[] = [];
     const visited: { [key: string]: boolean } = {};
     const color = board[unit[0].x][unit[0].y];

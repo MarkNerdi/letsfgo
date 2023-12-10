@@ -3,6 +3,7 @@ import { FieldState, GameStatus } from './enums';
 import type { BoardState } from './types';
 import sound from '$lib/assets/sounds/vine-boom.mp3';
 import { getLibertiesOfUnit, getSurroundingUnitsFromUnit, getUnitContainingCoordinates } from '$lib/game/utils';
+import { getAreaScoring } from '$lib/game/scorings';
 
 export class Game {
     public width: number;
@@ -50,7 +51,7 @@ export class Game {
         if (get(this.history).length === 0) {
             this.status.set(GameStatus.InProgress);
         }
-        
+
         this.history.update(history => {
             history.push(`${x},${y}`);
             return history;
@@ -86,8 +87,13 @@ export class Game {
         }
     }
 
+    getFinalScore(): { black: number, white: number } {
+        return getAreaScoring(get(this.boardState), this.width, this.height);
+    }
+
     getWinner(): FieldState {
-        return FieldState.Black;
+        const { black, white } = this.getFinalScore();
+        return black > white ? FieldState.Black : FieldState.White;
     }
 
     removeUnit(unit: { x: number, y: number }[]): void {

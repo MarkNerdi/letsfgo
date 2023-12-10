@@ -1,17 +1,24 @@
 <script lang="ts">
     export let history: string[] = [];
+
+    $: formattedHistory = history.map(item => {
+        if (item === 'pass') return 'pass';
+        const [x, y] = item.split(',').map((item) => parseInt(item));
+        return `${String.fromCharCode(x + 97).toUpperCase()}${y + 1}`;
+    });
 </script>
 
 <history-overview>
-    {#each history as item, index}
-    <div class="flex flex-row gap-1 items-center">
-        <stone class:black={index % 2 === 0 } />
-        <p>{item}</p>
+    {#each formattedHistory as item, index}
+        <div class="flex flex-row gap-1 items-center">
+            <p>{index + 1}.</p>
+            <stone class:black={index % 2 === 0 } />
+            <p>{item}</p>
 
-        {#if index !== history.length - 1}
-            ->
-        {/if}
-    </div>
+            {#if index !== history.length - 1}
+                ->
+            {/if}
+        </div>
     {/each}
 </history-overview>
 

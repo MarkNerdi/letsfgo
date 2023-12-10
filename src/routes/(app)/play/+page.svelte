@@ -47,7 +47,6 @@ import PlayerInfo from '$lib/components/PlayerInfo.svelte';
 
             {#if $status !== GameStatus.Ended}
                 <controlls>
-
                     <button class="primary" on:click={() => {
                         game?.pass($currentPlayer);
                     }}>

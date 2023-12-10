@@ -1,6 +1,6 @@
 import { derived, get, writable, type Writable, type Readable } from 'svelte/store';
 import { FieldState, GameStatus } from './enums';
-import type { BoardState } from './types';
+import type { BoardState, Stone, Unit } from './types';
 import sound from '$lib/assets/sounds/vine-boom.mp3';
 import { getLibertiesOfUnit, getSurroundingUnitsFromUnit, getUnitContainingCoordinates } from '$lib/game/utils';
 import { getAreaScoring } from '$lib/game/scorings';
@@ -106,7 +106,7 @@ export class Game {
         return black > white ? FieldState.Black : FieldState.White;
     }
 
-    removeUnit(unit: { x: number, y: number }[]): void {
+    removeUnit(unit: Unit): void {
         this.boardState.update(state => {
             unit.forEach(stone => {
                 state[stone.x][stone.y] = FieldState.Empty;
@@ -115,15 +115,15 @@ export class Game {
         });
     }
 
-    getSurroundingUnitsFromUnit(unit: { x: number, y: number }[]): { x: number, y: number }[][] {
+    getSurroundingUnitsFromUnit(unit: Unit): Unit[] {
         return getSurroundingUnitsFromUnit(unit, get(this.boardState));
     }
 
-    getUnitContainingCoordinates(x: number, y: number): { x: number, y: number }[] {
+    getUnitContainingCoordinates(x: number, y: number): Unit {
         return getUnitContainingCoordinates(x, y, get(this.boardState));
     }
 
-    getLibertiesOfUnit(unit: { x: number, y: number }[]): { x: number, y: number }[] {
+    getLibertiesOfUnit(unit: Unit): Stone[] {
         return getLibertiesOfUnit(unit, get(this.boardState));
     }
 }

@@ -1,6 +1,6 @@
 <script lang="ts">
     import HistoryOverview from '$lib/components/HistoryOverview.svelte';
-import PlayerInfo from '$lib/components/PlayerInfo.svelte';
+    import PlayerInfo from '$lib/components/PlayerInfo.svelte';
     import GameComp from '$lib/game/GameComp.svelte';
     import { GameStatus, PlayerColor } from '$lib/game/enums';
     import { Game } from '$lib/game/game';

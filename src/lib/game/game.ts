@@ -36,7 +36,6 @@ export class Game {
             this.status.set(GameStatus.InProgress);
         }
 
-        let sound: Sound = Sound.PlaceStone;
         this.history.update(history => {
             history.push(`${x},${y}`);
             return history;
@@ -46,34 +45,33 @@ export class Game {
             return state;
         });
 
-        let didCaptureSomething = false;
         const unit = this.getUnitContainingCoordinates(x, y);
         
+        let didAtari = false;
         const surroundingUnits = this.getSurroundingUnitsFromUnit(unit);
+        const unitsToRemove = [];
         for (const surroundingUnit of surroundingUnits) {
             const adjacentLiberties = this.getLibertiesOfUnit(surroundingUnit);
 
             const isAtari = adjacentLiberties.length === 1;
             if (isAtari) {
-                sound = Sound.Atari;
+                didAtari = true;
+                continue;
             }
 
             const isCapture = adjacentLiberties.length === 0;
             if (isCapture) {
-                didCaptureSomething = true;
-                this.removeUnit(surroundingUnit);
-
-                sound = Sound.KillUnit;
+                unitsToRemove.push(surroundingUnit);
             }
         }
 
-        const liberties = this.getLibertiesOfUnit(unit);
-
-        if (!didCaptureSomething && liberties.length === 0) {
-            this.removeUnit(unit);
-            sound = Sound.KillUnit;
+        const ownLiberties = this.getLibertiesOfUnit(unit);
+        if (!unitsToRemove.length && ownLiberties.length === 0) {
+            unitsToRemove.push(unit);
         }
-        playSound(sound);
+        unitsToRemove.forEach((_unit) => this.removeUnit(_unit));
+
+        this.playGameSound(!!unitsToRemove.length, didAtari);
     }
 
     pass(): void {
@@ -88,7 +86,7 @@ export class Game {
 
         const [secondLast, last] = get(this.history).slice(-2);
         if (secondLast === 'pass' && last === 'pass') {
-            this.status.set(GameStatus.Ended);
+            this.status.set(GameStatus.ChooseDeadStones);
         }
     }
 
@@ -117,6 +115,18 @@ export class Game {
             });
             return state;
         });
+    }
+
+    playGameSound(didCapture: boolean, didAtari: boolean): void {
+        let sound: Sound = Sound.PlaceStone;
+        if (didCapture) {
+            sound = Sound.KillUnit;
+        } else if (didAtari) {
+            sound = Sound.Atari;
+        } else {
+            sound = Sound.PlaceStone;
+        }
+        playSound(sound);
     }
 
     getSurroundingUnitsFromUnit(unit: Unit): Unit[] {

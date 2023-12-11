@@ -12,7 +12,7 @@ export function goBack() {
     history.back();
 }
 
-export function playSound(sound: string, volume = 0.1) {
+export function playSound(sound: string, volume = 0.2) {
     const audio = new Audio(sound);
     audio.volume = volume;
     audio.play();

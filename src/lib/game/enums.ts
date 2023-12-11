@@ -12,5 +12,6 @@ export enum PlayerColor {
 export enum GameStatus {
     NotStarted,
     InProgress,
+    ChooseDeadStones,
     Ended
 }

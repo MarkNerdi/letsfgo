@@ -1,7 +1,11 @@
 import { derived, get, writable, type Writable, type Readable } from 'svelte/store';
 import { FieldState, GameStatus } from './enums';
 import type { BoardState, Stone, Unit } from './types';
-import sound from '$lib/assets/sounds/vine-boom.mp3';
+import atari from '$lib/assets/sounds/vine-boom.mp3';
+import place1 from '$lib/assets/sounds/place1.wav';
+import place2 from '$lib/assets/sounds/place2.mp3';
+import kill1 from '$lib/assets/sounds/kill1.wav';
+import kill2 from '$lib/assets/sounds/kill2.wav';
 import { getLibertiesOfUnit, getSurroundingUnitsFromUnit, getUnitContainingCoordinates } from '$lib/game/utils';
 import { getAreaScoring } from '$lib/game/scorings';
 import { playSound } from '$lib/utils';
@@ -33,8 +37,15 @@ export class Game {
             throw Error;
         }
 
+        let sound = undefined;
+
         if (get(this.history).length === 0) {
             this.status.set(GameStatus.InProgress);
+        }
+        if (get(this.history).length % 2 === 0) {
+            sound = place1;
+        } else {
+            sound = place2;
         }
 
         this.history.update(history => {
@@ -55,13 +66,20 @@ export class Game {
 
             const isAtari = adjacentLiberties.length === 1;
             if (isAtari) {
-                playSound(sound);
+                sound = atari;
             }
 
             const isCapture = adjacentLiberties.length === 0;
             if (isCapture) {
                 didCaptureSomething = true;
                 this.removeUnit(surroundingUnit);
+
+                if (get(this.history).length % 2 === 0) {
+                    sound = kill1;
+                } else {
+                    sound = kill2;
+                }
+
             }
         }
 
@@ -69,6 +87,14 @@ export class Game {
 
         if (!didCaptureSomething && liberties.length === 0) {
             this.removeUnit(unit);
+            if (get(this.history).length % 2 === 0) {
+                sound = kill1;
+            } else {
+                sound = kill2;
+            }
+        }
+        if (sound) {
+            playSound(sound);
         }
     }
 

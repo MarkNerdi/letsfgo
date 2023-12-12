@@ -1,14 +1,14 @@
-import atari from '$lib/assets/sounds/vine-boom.mp3';
+import atari from '$lib/assets/sounds/atari.mp3';
 import placeStone from '$lib/assets/sounds/place-stone.mp3';
 import killUnit from '$lib/assets/sounds/kill-unit.wav';
 
 export enum Sound {
-    Atari,
+    Atari, // https://freesound.org/people/CamoMano/sounds/431019/
     PlaceStone, // https://freesound.org/people/el_boss/sounds/546119/
     KillUnit // https://freesound.org/people/NistuGgner/sounds/700535/
 }
 
-export function playSound(sound: Sound | undefined, volume = 0.2) {
+export function playSound(sound: Sound | undefined, volume = 0.3) {
     let soundPath = undefined;
     switch (sound) {
     case Sound.Atari:

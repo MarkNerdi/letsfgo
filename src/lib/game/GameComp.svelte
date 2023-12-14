@@ -9,62 +9,78 @@
     export let color: 'burlywood' | 'white' = 'white';
 
     $: boardState = game?.boardState;
+    $: cleanedBoardState = game?.cleanedBoardState;
     $: currentPlayer = game?.currentPlayer;
+    $: deadStones = game?.deadStones;
     $: gameStatus = game?.status;
-    $: evaluatedBoardState = (boardState && $boardState && $gameStatus === GameStatus.ChooseDeadStones) ? getEvaluatedBoardState($boardState) : undefined;
+
+    $: evaluatedBoardState = (cleanedBoardState && $cleanedBoardState && $gameStatus === GameStatus.ChooseDeadStones) ? getEvaluatedBoardState($cleanedBoardState) : undefined;
 
     function onEmptyClick(x: number, y: number): void {
-        if (!game || !currentPlayer) return;
-        game.setStone($currentPlayer, x, y);
+        const _currentPlayer = $currentPlayer;
+        if (!game || !_currentPlayer) return;
+        game.setStone(_currentPlayer, x, y);
     }
-    
 
     let hoveredCoordinate: Stone | undefined = undefined;
-
     $: hoveredUnit = (hoveredCoordinate && $boardState) ? getUnitContainingCoordinates(hoveredCoordinate?.x, hoveredCoordinate?.y, $boardState) : undefined;
-    let deadUnits = [];
 
     function onUnitClick(x: number, y: number): void {
-        if (!game || !currentPlayer) return;
-        game.setStone($currentPlayer, x, y);
-    }   
+        const _boardState = $boardState;
+        if (!_boardState || !game) return;
 
-    $: console.log(evaluatedBoardState);
-    
+        if (_boardState[x][y] === FieldState.Empty) return;
+
+        const unit = getUnitContainingCoordinates(x, y, _boardState);
+        game.addOrRemoveDeadStones(unit);
+    }
 </script>
 
 <EmptyBoard width={game?.width} height={game?.height} {color} let:index let:index2>
-    <grid-item slot="field" class="h-full w-full" on:mouseleave={() => hoveredCoordinate = undefined} on:mouseenter={() => hoveredCoordinate = { x: index, y: index2 }}>
+    <grid-item slot="field" class="h-full w-full">
         {#if !boardState || !$boardState}
             <!-- empty -->
-        {:else if $boardState[index][index2] === FieldState.Empty}
-            {#if $gameStatus === GameStatus.Ended}
-                <!-- empty -->
+        {:else if $gameStatus === GameStatus.ChooseDeadStones && evaluatedBoardState}
+            <button class="choose-unit"
+                on:click={() => onUnitClick(index, index2)}
+                on:mouseleave={() => hoveredCoordinate = undefined}
+                on:mouseenter={() => hoveredCoordinate = { x: index, y: index2 }}
+            >
+                {#if $boardState[index][index2] === FieldState.Empty}
+                    <evaluated-field class:black={evaluatedBoardState[index][index2] === FieldState.Black} class:white={evaluatedBoardState[index][index2] === FieldState.White}/> 
+                {:else}
+                    {@const isHovered = hoveredUnit?.some(stone => stone.x === index && stone.y === index2)}
+                    {@const isDead = $deadStones?.some(stone => stone.x === index && stone.y === index2)}
+                    <stone class:black={$boardState[index][index2] === FieldState.Black} class:hovered={isHovered} class:dead={isDead} >
+                        <evaluated-field class:black={evaluatedBoardState[index][index2] === FieldState.Black} class:white={evaluatedBoardState[index][index2] === FieldState.White}/> 
+                    </stone>
+                {/if}
+            </button>
+        {:else if $gameStatus === GameStatus.Ended}
+            {#if $cleanedBoardState && $cleanedBoardState[index][index2] !== FieldState.Empty}
+                 <stone class:black={$cleanedBoardState[index][index2] === FieldState.Black} />
             {:else}
-                <button on:click={() => onEmptyClick(index, index2)}>
-                    <stone class:black={$currentPlayer === FieldState.Black} />
-                </button>
+                 <!-- else content here -->
             {/if}
         {:else}
-            <stone class:black={$boardState[index][index2] === FieldState.Black} />
-        {/if}
-
-        {#if evaluatedBoardState && evaluatedBoardState[index][index2] !== FieldState.Empty}
-            <overlay>
-                <evaluated-field class:black={evaluatedBoardState[index][index2] === FieldState.Black}/> 
-            </overlay>
+            {#if $boardState[index][index2] === FieldState.Empty}
+                <button class="place-stone" on:click={() => onEmptyClick(index, index2)}>
+                    <stone class:black={$currentPlayer === FieldState.Black} />
+                </button>
+            {:else}
+                <stone class:black={$boardState[index][index2] === FieldState.Black} />
+            {/if}
         {/if}
     </grid-item>
 </EmptyBoard>
 
 <style lang="postcss">
-
     grid-item {
         @apply w-full h-full relative;
         @apply flex justify-center items-center;
     }
 
-    button {
+    .place-stone {
         @apply w-full h-full cursor-pointer;
         @apply flex justify-center items-center;
         @apply bg-transparent;        
@@ -80,30 +96,42 @@
         }
     }
 
+    .choose-unit {
+        @apply w-full h-full cursor-pointer;
+        @apply flex justify-center items-center;
+    }
+
     stone {
-        @apply block;
         @apply w-5/6 h-5/6 rounded-full;
         @apply border-2 border-solid border-black bg-white;
+        @apply flex justify-center items-center;
 
         &.black {
             @apply bg-black;
         }
-    }
 
-    overlay {
-        @apply w-full h-full absolute top-0 left-0;
-        @apply flex justify-center items-center;
+        &.dead {
+            @apply opacity-60;
+        }
+        &.hovered {
+            @apply opacity-60;
+            @apply cursor-pointer
+        }
     }
 
     evaluated-field {
         @apply w-3/12 h-1/4;
         @apply flex justify-center items-center;
-        @apply bg-white;
-        @apply border-2 border-solid border-black;
+        @apply bg-transparent;
 
         &.black {
             @apply bg-black;
-            @apply border-white;
+            @apply border-2 border-solid border-white;
+        }
+
+        &.white {
+            @apply bg-white;
+            @apply border-2 border-solid border-black;
         }
     }
 </style>

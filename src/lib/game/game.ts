@@ -10,6 +10,8 @@ export class Game {
     public height: number;
     public status: Writable<GameStatus>;
     public boardState: Writable<BoardState>;
+    public cleanedBoardState: Readable<BoardState>;
+    public deadStones: Writable<Stone[]>;
     public history: Writable<string[]>;
     public currentPlayer: Readable<FieldState>;
 
@@ -25,6 +27,14 @@ export class Game {
             return history.length % 2 === 0 ? FieldState.Black : FieldState.White;
         });
         this.status = writable(GameStatus.NotStarted);
+        this.deadStones = writable([]);
+        this.cleanedBoardState = derived([this.boardState, this.deadStones], ([boardState, deadStones]) => {
+            const cleanedBoardState: BoardState = structuredClone(boardState);
+            deadStones.forEach(stone => {
+                cleanedBoardState[stone.x][stone.y] = FieldState.Empty;
+            });
+            return cleanedBoardState;
+        });
     }
 
     setStone(stone: FieldState, x: number, y: number): void {
@@ -103,11 +113,35 @@ export class Game {
         return getAreaScoring(get(this.boardState));
     }
 
-    getWinner(): FieldState {
+    getWinner(): string {
         const { black, white } = this.getFinalScore();
-        return black > white ? FieldState.Black : FieldState.White;
+        return black > white ? 'Black' : 'White';
     }
 
+    addOrRemoveDeadStones(unit: Unit): void {
+        this.deadStones.update(stones => {
+            if (unit.length === 0) {
+                return stones;
+            }
+
+            unit.forEach(_stone => {
+                const deadStoneIndex = stones.findIndex(stone => stone.x === _stone.x && stone.y === _stone.y);
+                console.log(deadStoneIndex);
+                
+                if (deadStoneIndex >= 0) {
+                    stones.splice(deadStoneIndex, 1);
+                } else {
+                    stones.push(_stone);
+                }
+            });
+            return stones;
+        });
+    }
+
+    finishGame(): void {
+        this.status.set(GameStatus.Ended);
+    }
+    
     removeUnit(unit: Unit): void {
         this.boardState.update(state => {
             unit.forEach(stone => {

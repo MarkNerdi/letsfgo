@@ -7,13 +7,20 @@
 
     let game: Game | undefined = undefined;
 
+    $: status = game?.status;
+    $: history = game?.history;
+
     function startNewGame(): void {
         game = new Game(9, 9);
     }
 
-    $: status = game?.status;
-    $: history = game?.history;
-    $: currentPlayer = game?.currentPlayer;
+    function onAcceptDeadStonesClick(): void {
+        game?.finishGame();
+    }
+
+    function onPassClick(): void {
+        game?.pass();
+    }
 </script>
 
 <play-view>
@@ -24,7 +31,7 @@
             03: 03
         </div>
     </player-section>
-    <GameComp bind:game />
+    <GameComp bind:game/>
     <player-section>
         <PlayerInfo color={PlayerColor.White} name="Player 1" rank="1d" />
         <div >
@@ -45,11 +52,9 @@
                 <HistoryOverview history={$history} />
             </history-container>
 
-            {#if $status !== GameStatus.Ended}
+            {#if $status === GameStatus.InProgress}
                 <controlls>
-                    <button class="primary" on:click={() => {
-                        game?.pass($currentPlayer);
-                    }}>
+                    <button class="primary" on:click={onPassClick}>
                         Pass
                     </button>
                     <div class="w-full flex flex-row gap-4 justify-center items-center">
@@ -64,6 +69,13 @@
                             Resign
                         </button>
                     </div>
+                </controlls>
+            {:else if $status === GameStatus.ChooseDeadStones}
+                <controlls>
+                    <h2>Choose Dead stones</h2>
+                    <button class="primary" on:click={onAcceptDeadStonesClick}>
+                        Accept
+                    </button>
                 </controlls>
             {:else}
                 <analysis>

@@ -11,7 +11,6 @@ export function getEvaluatedBoardState(boardState: BoardState): BoardState {
 
     for (const [index, row] of boardState.entries()) {
         for (const [index2, field] of row.entries()) {
-            
             if (visited[`${index},${index2}`]) {
                 continue;
             }

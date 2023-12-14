@@ -9,7 +9,7 @@
         {#each Array(width) as _, index}
             {#each Array(height) as _, index2}
                 <grid-item>
-                    <slot index={index} index2={index2} />
+                    <slot {index} {index2} />
                 </grid-item>
             {/each}
         {/each}

@@ -19,9 +19,9 @@ export class Game {
         this.width = width;
         this.height = height;
 
-        this.boardState = writable(Array.from({ length: height }, ()=> {
+        this.boardState = writable(Array.from({ length: height }, () => {
             return Array.from({ length: width }, () => FieldState.Empty);
-        })); 
+        }));
         this.history = writable([]);
         this.currentPlayer = derived([this.history], ([history]) => {
             return history.length % 2 === 0 ? FieldState.Black : FieldState.White;
@@ -56,7 +56,7 @@ export class Game {
         });
 
         const unit = this.getUnitContainingCoordinates(x, y);
-        
+
         let didAtari = false;
         const surroundingUnits = this.getSurroundingUnitsFromUnit(unit);
         const unitsToRemove = [];
@@ -127,7 +127,7 @@ export class Game {
             unit.forEach(_stone => {
                 const deadStoneIndex = stones.findIndex(stone => stone.x === _stone.x && stone.y === _stone.y);
                 console.log(deadStoneIndex);
-                
+
                 if (deadStoneIndex >= 0) {
                     stones.splice(deadStoneIndex, 1);
                 } else {
@@ -141,7 +141,7 @@ export class Game {
     finishGame(): void {
         this.status.set(GameStatus.Ended);
     }
-    
+
     removeUnit(unit: Unit): void {
         this.boardState.update(state => {
             unit.forEach(stone => {

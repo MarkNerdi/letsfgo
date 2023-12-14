@@ -11,7 +11,6 @@
     <p>{name} · {rank}</p>
 </player-info>
 
-
 <style lang="postcss">
     player-info {
         @apply flex flex-row justify-center items-center gap-2;

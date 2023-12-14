@@ -1,7 +1,6 @@
 <script lang="ts">
 </script>
 
-
 <header>
     <div>Let's f goooo</div>
     <a href="/play">Play</a>

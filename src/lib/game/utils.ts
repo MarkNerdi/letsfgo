@@ -3,7 +3,7 @@ import type { BoardState, Stone, Unit } from '$lib/game/types';
 
 export function getEvaluatedBoardState(boardState: BoardState): BoardState {
     const { width, height } = getDimensionsFromBoardState(boardState);
-    const evaluatedBoardState: BoardState = Array.from({ length: height }, ()=> {
+    const evaluatedBoardState: BoardState = Array.from({ length: height }, () => {
         return Array.from({ length: width }, () => FieldState.Empty);
     });
     const visited: { [key: string]: boolean } = {};
@@ -14,7 +14,7 @@ export function getEvaluatedBoardState(boardState: BoardState): BoardState {
             if (visited[`${index},${index2}`]) {
                 continue;
             }
-            
+
             if (field === FieldState.Empty) {
                 const unit = getUnitContainingCoordinates(index, index2, boardState);
                 const surroundingStones = getSurroundingStonesFromUnit(unit, boardState);
@@ -50,7 +50,7 @@ export function getUnitContainingCoordinates(x: number, y: number, board: BoardS
         }
 
         unit.push({ x: currentX, y: currentY });
-        
+
         const adjacentCoordinates = getAdjacentCoordinates(currentX, currentY, board);
         adjacentCoordinates.forEach(adjacent => {
             getUnitRecursively(adjacent.x, adjacent.y);

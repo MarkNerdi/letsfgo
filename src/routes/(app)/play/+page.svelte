@@ -24,81 +24,75 @@
 </script>
 
 <play-view>
-  <game-container>
-    <player-section>
-        <PlayerInfo color={PlayerColor.Black} name="Player 2" rank="2d" />
-        <div >
-            03: 03
-        </div>
-    </player-section>
-    <GameComp bind:game/>
-    <player-section>
-        <PlayerInfo color={PlayerColor.White} name="Player 1" rank="1d" />
-        <div >
-            03: 03
-        </div>
-    </player-section>
-  </game-container>
+    <game-container>
+        <player-section>
+            <PlayerInfo color={PlayerColor.Black} name="Player 2" rank="2d" />
+            <div>03: 03</div>
+        </player-section>
+        <GameComp bind:game />
+        <player-section>
+            <PlayerInfo color={PlayerColor.White} name="Player 1" rank="1d" />
+            <div>03: 03</div>
+        </player-section>
+    </game-container>
 
-  <side-container>
-    {#if game}
-        <game-info-box>
-            <game-info>
-                <div>Rapid - 5+0</div>
-                <div>9x9</div>
-                <div>23.03.2023</div>
-            </game-info>
-            <history-container>
-                <HistoryOverview history={$history} />
-            </history-container>
+    <side-container>
+        {#if game}
+            <game-info-box>
+                <game-info>
+                    <div>Rapid - 5+0</div>
+                    <div>9x9</div>
+                    <div>23.03.2023</div>
+                </game-info>
+                <history-container>
+                    <HistoryOverview history={$history} />
+                </history-container>
 
-            {#if $status === GameStatus.InProgress}
-                <controlls>
-                    <button class="primary" on:click={onPassClick}>
-                        Pass
-                    </button>
-                    <div class="w-full flex flex-row gap-4 justify-center items-center">
-                        <button on:click={() => {
-                            console.log('clicked');
-                        }}>
-                            Takeback
-                        </button>
-                        <button on:click={() => {
-                            game?.surrender();
-                        }}>
-                            Resign
-                        </button>
-                    </div>
-                </controlls>
-            {:else if $status === GameStatus.ChooseDeadStones}
-                <controlls>
-                    <h2>Choose Dead stones</h2>
-                    <button class="primary" on:click={onAcceptDeadStonesClick}>
-                        Accept
-                    </button>
-                </controlls>
-            {:else}
-                <analysis>
-                    hoi do kimmp die analyse
-                </analysis>
-            {/if}
-        </game-info-box>
-    {/if}
-
-    <bottom-box>
-        {#if game && $status === GameStatus.Ended}
-            <h2>
-                {game.getWinner()} won!
-            </h2>
-            <div class="w-full flex flex-row gap-4 justify-center items-center">
-                <button class="primary" on:click={startNewGame}>Rematch</button>
-                <button class="primary" on:click={startNewGame}>New opponent</button>
-            </div>
-        {:else if !game}
-            <button class="primary" on:click={startNewGame}>Lets GOOOOOO</button>
+                {#if $status === GameStatus.InProgress}
+                    <controlls>
+                        <button class="primary" on:click={onPassClick}> Pass </button>
+                        <div class="w-full flex flex-row gap-4 justify-center items-center">
+                            <button
+                                on:click={() => {
+                                    console.log('clicked');
+                                }}
+                            >
+                                Takeback
+                            </button>
+                            <button
+                                on:click={() => {
+                                    game?.surrender();
+                                }}
+                            >
+                                Resign
+                            </button>
+                        </div>
+                    </controlls>
+                {:else if $status === GameStatus.ChooseDeadStones}
+                    <controlls>
+                        <h2>Choose Dead stones</h2>
+                        <button class="primary" on:click={onAcceptDeadStonesClick}> Accept </button>
+                    </controlls>
+                {:else}
+                    <analysis> hoi do kimmp die analyse </analysis>
+                {/if}
+            </game-info-box>
         {/if}
-    </bottom-box>
-  </side-container>
+
+        <bottom-box>
+            {#if game && $status === GameStatus.Ended}
+                <h2>
+                    {game.getWinner()} won!
+                </h2>
+                <div class="w-full flex flex-row gap-4 justify-center items-center">
+                    <button class="primary" on:click={startNewGame}>Rematch</button>
+                    <button class="primary" on:click={startNewGame}>New opponent</button>
+                </div>
+            {:else if !game}
+                <button class="primary" on:click={startNewGame}>Lets GOOOOOO</button>
+            {/if}
+        </bottom-box>
+    </side-container>
 </play-view>
 
 <style lang="postcss">
@@ -122,7 +116,8 @@
         @apply flex flex-col justify-center items-center gap-2;
     }
 
-    game-info-box, bottom-box {
+    game-info-box,
+    bottom-box {
         @apply w-full h-full;
         @apply flex flex-col;
         @apply bg-gray-100;
@@ -139,7 +134,9 @@
         @apply flex flex-col justify-center items-center gap-4;
     }
 
-    game-info, history-container, controlls {
+    game-info,
+    history-container,
+    controlls {
         @apply w-full p-4;
     }
 

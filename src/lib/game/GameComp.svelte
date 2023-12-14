@@ -14,7 +14,10 @@
     $: deadStones = game?.deadStones;
     $: gameStatus = game?.status;
 
-    $: evaluatedBoardState = (cleanedBoardState && $cleanedBoardState && $gameStatus === GameStatus.ChooseDeadStones) ? getEvaluatedBoardState($cleanedBoardState) : undefined;
+    $: evaluatedBoardState =
+        cleanedBoardState && $cleanedBoardState && $gameStatus === GameStatus.ChooseDeadStones
+            ? getEvaluatedBoardState($cleanedBoardState)
+            : undefined;
 
     function onEmptyClick(x: number, y: number): void {
         const _currentPlayer = $currentPlayer;
@@ -23,7 +26,10 @@
     }
 
     let hoveredCoordinate: Stone | undefined = undefined;
-    $: hoveredUnit = (hoveredCoordinate && $boardState) ? getUnitContainingCoordinates(hoveredCoordinate?.x, hoveredCoordinate?.y, $boardState) : undefined;
+    $: hoveredUnit =
+        hoveredCoordinate && $boardState
+            ? getUnitContainingCoordinates(hoveredCoordinate?.x, hoveredCoordinate?.y, $boardState)
+            : undefined;
 
     function onUnitClick(x: number, y: number): void {
         const _boardState = $boardState;
@@ -41,35 +47,44 @@
         {#if !boardState || !$boardState}
             <!-- empty -->
         {:else if $gameStatus === GameStatus.ChooseDeadStones && evaluatedBoardState}
-            <button class="choose-unit"
+            <button
+                class="choose-unit"
                 on:click={() => onUnitClick(index, index2)}
-                on:mouseleave={() => hoveredCoordinate = undefined}
-                on:mouseenter={() => hoveredCoordinate = { x: index, y: index2 }}
+                on:mouseleave={() => (hoveredCoordinate = undefined)}
+                on:mouseenter={() => (hoveredCoordinate = { x: index, y: index2 })}
             >
                 {#if $boardState[index][index2] === FieldState.Empty}
-                    <evaluated-field class:black={evaluatedBoardState[index][index2] === FieldState.Black} class:white={evaluatedBoardState[index][index2] === FieldState.White}/> 
+                    <evaluated-field
+                        class:black={evaluatedBoardState[index][index2] === FieldState.Black}
+                        class:white={evaluatedBoardState[index][index2] === FieldState.White}
+                    />
                 {:else}
-                    {@const isHovered = hoveredUnit?.some(stone => stone.x === index && stone.y === index2)}
-                    {@const isDead = $deadStones?.some(stone => stone.x === index && stone.y === index2)}
-                    <stone class:black={$boardState[index][index2] === FieldState.Black} class:hovered={isHovered} class:dead={isDead} >
-                        <evaluated-field class:black={evaluatedBoardState[index][index2] === FieldState.Black} class:white={evaluatedBoardState[index][index2] === FieldState.White}/> 
+                    {@const isHovered = hoveredUnit?.some((stone) => stone.x === index && stone.y === index2)}
+                    {@const isDead = $deadStones?.some((stone) => stone.x === index && stone.y === index2)}
+                    <stone
+                        class:black={$boardState[index][index2] === FieldState.Black}
+                        class:hovered={isHovered}
+                        class:dead={isDead}
+                    >
+                        <evaluated-field
+                            class:black={evaluatedBoardState[index][index2] === FieldState.Black}
+                            class:white={evaluatedBoardState[index][index2] === FieldState.White}
+                        />
                     </stone>
                 {/if}
             </button>
         {:else if $gameStatus === GameStatus.Ended}
             {#if $cleanedBoardState && $cleanedBoardState[index][index2] !== FieldState.Empty}
-                 <stone class:black={$cleanedBoardState[index][index2] === FieldState.Black} />
+                <stone class:black={$cleanedBoardState[index][index2] === FieldState.Black} />
             {:else}
-                 <!-- else content here -->
+                <!-- else content here -->
             {/if}
+        {:else if $boardState[index][index2] === FieldState.Empty}
+            <button class="place-stone" on:click={() => onEmptyClick(index, index2)}>
+                <stone class:black={$currentPlayer === FieldState.Black} />
+            </button>
         {:else}
-            {#if $boardState[index][index2] === FieldState.Empty}
-                <button class="place-stone" on:click={() => onEmptyClick(index, index2)}>
-                    <stone class:black={$currentPlayer === FieldState.Black} />
-                </button>
-            {:else}
-                <stone class:black={$boardState[index][index2] === FieldState.Black} />
-            {/if}
+            <stone class:black={$boardState[index][index2] === FieldState.Black} />
         {/if}
     </grid-item>
 </EmptyBoard>
@@ -83,7 +98,7 @@
     .place-stone {
         @apply w-full h-full cursor-pointer;
         @apply flex justify-center items-center;
-        @apply bg-transparent;        
+        @apply bg-transparent;
 
         stone {
             @apply opacity-0;
@@ -115,7 +130,7 @@
         }
         &.hovered {
             @apply opacity-60;
-            @apply cursor-pointer
+            @apply cursor-pointer;
         }
     }
 

@@ -1,8 +1,7 @@
 <script lang="ts">
     import { windowWidth } from '$lib/stores/window.store.ts';
     import { onMount } from 'svelte';
-    import '$lib/style/global.scss';
-    import '$lib/style/global.scss';
+    import '../app.css';
 
     onMount(() => {
         $windowWidth = window.innerWidth;

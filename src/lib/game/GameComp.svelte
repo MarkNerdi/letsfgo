@@ -37,7 +37,7 @@
 </script>
 
 <EmptyBoard width={game?.width} height={game?.height} {color} let:index let:index2>
-    <grid-item slot="field" class="h-full w-full">
+    <grid-item class="h-full w-full">
         {#if !boardState || !$boardState}
             <!-- empty -->
         {:else if $gameStatus === GameStatus.ChooseDeadStones && evaluatedBoardState}

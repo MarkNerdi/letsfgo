@@ -1,7 +1,7 @@
 <script lang="ts">
     import HistoryOverview from '$lib/components/HistoryOverview.svelte';
     import PlayerInfo from '$lib/components/PlayerInfo.svelte';
-    import GameComp from '$lib/game/GameComp.svelte';
+    import Board from '$lib/game/Board.svelte';
     import { GameStatus, PlayerColor } from '$lib/game/enums';
     import { Game } from '$lib/game/game';
 
@@ -29,7 +29,7 @@
             <PlayerInfo color={PlayerColor.Black} name="Player 2" rank="2d" />
             <div>03: 03</div>
         </player-section>
-        <GameComp bind:game />
+        <Board bind:game columns={9} rows={9} />
         <player-section>
             <PlayerInfo color={PlayerColor.White} name="Player 1" rank="1d" />
             <div>03: 03</div>

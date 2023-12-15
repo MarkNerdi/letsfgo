@@ -110,7 +110,7 @@ export class Game {
     }
 
     getFinalScore(): { black: number, white: number } {
-        return getAreaScoring(get(this.boardState));
+        return getAreaScoring(get(this.cleanedBoardState));
     }
 
     getWinner(): string {

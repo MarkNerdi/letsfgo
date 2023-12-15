@@ -86,10 +86,10 @@
                                     />
                                 {:else}
                                     {@const isHovered = hoveredUnit?.some(
-                                        (stone) => stone.x === index && stone.y === index2,
+                                        (stone) => stone.x === index && stone.y === index2
                                     )}
                                     {@const isDead = $deadStones?.some(
-                                        (stone) => stone.x === index && stone.y === index2,
+                                        (stone) => stone.x === index && stone.y === index2
                                     )}
                                     <stone
                                         class:black={$boardState[index][index2] === FieldState.Black}
@@ -153,7 +153,7 @@
     }
 
     game-board {
-        display: grid;
+        @apply grid z-20;
         grid-template-rows: auto;
     }
 
@@ -167,22 +167,25 @@
         @apply flex justify-center items-center;
         @apply bg-transparent;
 
-        stone {
-            @apply opacity-0;
-
-            &:hover {
+        &:hover {
+            stone {
                 @apply opacity-60;
             }
+        }
+
+        stone {
+            @apply opacity-0;
         }
     }
 
     .choose-unit {
         @apply w-full h-full cursor-pointer;
         @apply flex justify-center items-center;
+        @apply bg-transparent;
     }
 
     stone {
-        @apply w-5/6 h-5/6 rounded-full;
+        @apply w-[90%] h-[90%] rounded-full;
         @apply border-2 border-solid border-black bg-white;
         @apply flex justify-center items-center;
         z-index: 1;

@@ -1,6 +1,7 @@
 import { GameStatus } from '$lib/game/enums';
+import type { GameSettings } from '$lib/game/types';
 import { gameCollection } from '$lib/server/db';
-import type { Game, GameSettings } from '$lib/server/games/games.types';
+import type { Game } from '$lib/server/games/games.types';
 import { ObjectId } from 'mongodb';
 
 

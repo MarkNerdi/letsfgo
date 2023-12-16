@@ -22,8 +22,8 @@ export enum Scoring {
 }
 
 export enum ResultType {
-    ByScore = 'area',
-    ByResign = 'area',
-    ByTimeout = 'area',
-    ByDisconnect = 'area',
+    ByScore,
+    ByResign,
+    ByTimeout,
+    ByDisconnect,
 }

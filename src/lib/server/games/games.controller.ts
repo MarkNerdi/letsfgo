@@ -2,7 +2,7 @@ import { GameStatus } from '$lib/game/enums';
 import type { GameSettings } from '$lib/game/types';
 import { gameCollection } from '$lib/server/db';
 import type { Game } from '$lib/server/games/games.types';
-import { ObjectId } from 'mongodb';
+import { ObjectId, type UpdateResult } from 'mongodb';
 
 
 async function create(settings: GameSettings): Promise<Game | null> {
@@ -31,7 +31,12 @@ async function getById(id: string): Promise<Game | null> {
     return game;
 }
 
+async function update(id: string, game: Partial<Game>): Promise<UpdateResult> {
+    return gameCollection.updateOne({ _id: new ObjectId(id) }, { $set: { ...game } });
+}
+
 export const gameController = {
     create,
+    update,
     getById,
 };

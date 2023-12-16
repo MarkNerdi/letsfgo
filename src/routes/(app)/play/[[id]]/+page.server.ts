@@ -1,8 +1,8 @@
 import { error, type Actions, fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types.ts';
 import { gameController } from '$lib/server/games/games.controller.ts';
-import { Scoring } from '$lib/game/enums.ts';
-import type { GameSettings } from '$lib/game/types.ts';
+import { GameStatus, PlayerColor, ResultType, Scoring } from '$lib/game/enums.ts';
+import type { GameResult, GameSettings } from '$lib/game/types.ts';
 
 export const load: PageServerLoad = (async ({ params }) => {
     if (!params.id) {
@@ -110,5 +110,18 @@ export const actions: Actions = {
         } else {
             return fail(400, { error: 'Komi muss eine positive Zahl sein.' });
         }
+    },
+    resign: async ({ request }) => {
+        const data = await request.formData();
+
+        const currentPlayer = Number(data.get('currentPlayer'));
+        const gameId = String(data.get('gameId'));
+
+        const gameResult: GameResult = {
+            type: ResultType.ByResign,
+            winner: currentPlayer === PlayerColor.Black ? PlayerColor.White : PlayerColor.Black,
+        };
+
+        await gameController.update(gameId, { result: gameResult, status: GameStatus.Ended });
     },
 };

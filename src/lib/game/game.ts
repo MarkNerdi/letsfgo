@@ -1,12 +1,13 @@
 import { derived, get, writable, type Writable, type Readable } from 'svelte/store';
 import { FieldState, GameStatus } from './enums';
-import type { BoardState, GameSettings, Stone, Unit } from './types';
+import type { BoardState, GameResult, GameSettings, Stone, Unit } from './types';
 import { getLibertiesOfUnit, getSurroundingUnitsFromUnit, getUnitContainingCoordinates } from '$lib/game/utils';
 import { getAreaScoring } from '$lib/game/scorings';
 import { Sound, playSound } from '$lib/utils';
 import type { Game as DBGame } from '$lib/server/games/games.types';
 
 export class Game {
+    public id: string;
     public status: Writable<GameStatus>;
     public boardState: Writable<BoardState>;
     public cleanedBoardState: Readable<BoardState>;
@@ -14,10 +15,13 @@ export class Game {
     public history: Writable<string[]>;
     public currentPlayer: Readable<FieldState>;
     public settings: GameSettings;
+    public result: GameResult | undefined;
 
 
-    constructor(settings: GameSettings) {
+    constructor(id: string, settings: GameSettings, result?: GameResult, status: GameStatus = GameStatus.NotStarted) {
+        this.id = id;
         this.settings = settings;
+        this.result = result;
 
         this.boardState = writable(Array.from({ length: settings.height }, () => {
             return Array.from({ length: settings.width }, () => FieldState.Empty);
@@ -26,7 +30,7 @@ export class Game {
         this.currentPlayer = derived([this.history], ([history]) => {
             return history.length % 2 === 0 ? FieldState.Black : FieldState.White;
         });
-        this.status = writable(GameStatus.NotStarted);
+        this.status = writable(status);
         this.deadStones = writable([]);
         this.cleanedBoardState = derived([this.boardState, this.deadStones], ([boardState, deadStones]) => {
             const cleanedBoardState: BoardState = structuredClone(boardState);
@@ -38,7 +42,7 @@ export class Game {
     }
 
     static init(dbGame: DBGame): Game {
-        return new Game(dbGame.settings);
+        return new Game(String(dbGame._id), dbGame.settings, dbGame.result, dbGame.status);
     }
 
     setStone(stone: FieldState, x: number, y: number): void {

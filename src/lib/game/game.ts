@@ -1,26 +1,26 @@
 import { derived, get, writable, type Writable, type Readable } from 'svelte/store';
 import { FieldState, GameStatus } from './enums';
-import type { BoardState, Stone, Unit } from './types';
+import type { BoardState, GameSettings, Stone, Unit } from './types';
 import { getLibertiesOfUnit, getSurroundingUnitsFromUnit, getUnitContainingCoordinates } from '$lib/game/utils';
 import { getAreaScoring } from '$lib/game/scorings';
 import { Sound, playSound } from '$lib/utils';
+import type { Game as DBGame } from '$lib/server/games/games.types';
 
 export class Game {
-    public width: number;
-    public height: number;
     public status: Writable<GameStatus>;
     public boardState: Writable<BoardState>;
     public cleanedBoardState: Readable<BoardState>;
     public deadStones: Writable<Stone[]>;
     public history: Writable<string[]>;
     public currentPlayer: Readable<FieldState>;
+    public settings: GameSettings;
 
-    constructor(width: number, height: number) {
-        this.width = width;
-        this.height = height;
 
-        this.boardState = writable(Array.from({ length: height }, () => {
-            return Array.from({ length: width }, () => FieldState.Empty);
+    constructor(settings: GameSettings) {
+        this.settings = settings;
+
+        this.boardState = writable(Array.from({ length: settings.height }, () => {
+            return Array.from({ length: settings.width }, () => FieldState.Empty);
         }));
         this.history = writable([]);
         this.currentPlayer = derived([this.history], ([history]) => {
@@ -37,8 +37,12 @@ export class Game {
         });
     }
 
+    static init(dbGame: DBGame): Game {
+        return new Game(dbGame.settings);
+    }
+
     setStone(stone: FieldState, x: number, y: number): void {
-        if (x >= this.width || x < 0 || y >= this.height || y < 0) {
+        if (x >= this.settings.width || x < 0 || y >= this.settings.height || y < 0) {
             throw Error;
         }
 

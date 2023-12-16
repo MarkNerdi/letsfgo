@@ -15,3 +15,15 @@ export enum GameStatus {
     ChooseDeadStones,
     Ended
 }
+
+export enum Scoring {
+    Area,
+    Territory
+}
+
+export enum ResultType {
+    ByScore = 'area',
+    ByResign = 'area',
+    ByTimeout = 'area',
+    ByDisconnect = 'area',
+}

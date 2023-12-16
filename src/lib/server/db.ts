@@ -15,3 +15,4 @@ export async function connectToDatabase() {
     }
 }
 
+export const gameCollection = db.collection<Game>('game');

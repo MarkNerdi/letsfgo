@@ -1,17 +1,20 @@
 <script lang="ts">
+    import type { PageData } from './$types.ts';
     import HistoryOverview from '$lib/components/HistoryOverview.svelte';
     import PlayerInfo from '$lib/components/PlayerInfo.svelte';
     import Board from '$lib/game/Board.svelte';
-    import { GameStatus, PlayerColor } from '$lib/game/enums';
+    import { GameStatus, PlayerColor, Scoring } from '$lib/game/enums';
     import { Game } from '$lib/game/game';
+
+    export let data: PageData;
 
     let game: Game | undefined = undefined;
 
     $: status = game?.status;
     $: history = game?.history;
 
-    function startNewGame(): void {
-        game = new Game(9, 9);
+    $: if (data.game) {
+        game = Game.init(data.game);
     }
 
     function onAcceptDeadStonesClick(): void {
@@ -80,17 +83,25 @@
         {/if}
 
         <bottom-box>
-            {#if game && $status === GameStatus.Ended}
-                <h2>
-                    {game.getWinner()} won!
-                </h2>
-                <div class="w-full flex flex-row gap-4 justify-center items-center">
-                    <button class="primary" on:click={startNewGame}>Rematch</button>
-                    <button class="primary" on:click={startNewGame}>New opponent</button>
-                </div>
-            {:else if !game}
-                <button class="primary" on:click={startNewGame}>Lets GOOOOOO</button>
-            {/if}
+            <form method="POST" action="?/startGame">
+                <input type="hidden" name="width" value={9} />
+                <input type="hidden" name="height" value={9} />
+                <input type="hidden" name="initialTime" value={5} />
+                <input type="hidden" name="increment" value={3} />
+                <input type="hidden" name="komi" value={3} />
+                <input type="hidden" name="scoring" value={Scoring.Area} />
+                {#if game && $status === GameStatus.Ended}
+                    <h2>
+                        {game.getWinner()} won!
+                    </h2>
+                    <div class="w-full flex flex-row gap-4 justify-center items-center">
+                        <button class="primary" formaction="?/rematch" >Rematch</button>
+                        <button class="primary" >New opponent</button>
+                    </div>
+                {:else if !game}
+                    <button class="primary">Lets GOOOOOO</button>
+                {/if}
+            </form>
         </bottom-box>
     </side-container>
 </play-view>

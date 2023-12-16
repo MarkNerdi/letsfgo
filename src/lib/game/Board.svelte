@@ -6,13 +6,10 @@
 
     export let game: Game | undefined;
     export let color: 'burlywood' | 'white' = 'white';
-    export let columns: number;
-    export let rows: number;
+
 
     const boardSize = 700;
     const boardPadding = 50;
-    const stoneSize = boardSize / Math.max(columns, rows);
-
     $: boardState = game?.boardState;
     $: cleanedBoardState = game?.cleanedBoardState;
     $: currentPlayer = game?.currentPlayer;
@@ -23,6 +20,12 @@
         cleanedBoardState && $cleanedBoardState && $gameStatus === GameStatus.ChooseDeadStones
             ? getEvaluatedBoardState($cleanedBoardState)
             : undefined;
+
+
+    $: columns = boardState && $boardState ? $boardState.length ?? 9 : 9;
+    $: rows = boardState && $boardState ? $boardState[0]?.length ?? 9 : 9;
+    $: stoneSize = boardSize / Math.max(columns, rows);
+
 
     function onEmptyClick(x: number, y: number): void {
         const _currentPlayer = $currentPlayer;

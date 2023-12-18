@@ -58,14 +58,8 @@
                         <input type="hidden" name="currentPlayer" value={$currentPlayer} />
                         <button class="primary" on:click={onPassClick}> Pass </button>
                         <div class="w-full flex flex-row gap-4 justify-center items-center">
-                            <button
-                                on:click={() => console.log('clicked')}
-                            >
-                                Takeback
-                            </button>
-                            <button formaction="?/resign">
-                                Resign
-                            </button>
+                            <button on:click={() => console.log('clicked')}> Takeback </button>
+                            <button formaction="?/resign"> Resign </button>
                         </div>
                     </form>
                 {:else if $status === GameStatus.ChooseDeadStones}
@@ -92,8 +86,8 @@
                         {game.getWinner()} won!
                     </h2>
                     <div class="w-full flex flex-row gap-4 justify-center items-center">
-                        <button class="primary" formaction="?/rematch" >Rematch</button>
-                        <button class="primary" >New opponent</button>
+                        <button class="primary" formaction="?/rematch">Rematch</button>
+                        <button class="primary">New opponent</button>
                     </div>
                 {:else if !game}
                     <button class="primary">Lets GOOOOOO</button>
@@ -120,7 +114,7 @@
     }
 
     side-container {
-        @apply w-[500px] h-full;
+        @apply w-[500px] h-[700px];
         @apply flex flex-col justify-center items-center gap-2;
     }
 
@@ -143,8 +137,7 @@
     }
 
     game-info,
-    history-container,
-    controlls {
+    history-container {
         @apply w-full p-4;
     }
 

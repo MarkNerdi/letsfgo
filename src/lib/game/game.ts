@@ -1,9 +1,9 @@
 import { derived, get, writable, type Writable, type Readable } from 'svelte/store';
-import { FieldState, GameStatus } from './enums';
+import { FieldState, GameStatus, Sound } from './enums';
 import type { BoardState, GameResult, GameSettings, Stone, Unit } from './types';
 import { getLibertiesOfUnit, getSurroundingUnitsFromUnit, getUnitContainingCoordinates } from '$lib/game/utils';
 import { getAreaScoring } from '$lib/game/scorings';
-import { Sound, playSound } from '$lib/utils';
+import { playSound } from '$lib/utils/sound';
 import type { Game as DBGame } from '$lib/server/games/games.types';
 
 export class Game {

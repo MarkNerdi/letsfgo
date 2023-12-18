@@ -22,12 +22,10 @@
 
     h2 {
         font-size: 30px;
-        font-family: var(--fontFamilyAlt);
     }
 
     h3 {
         font-size: 22px;
-        font-family: var(--fontFamilyAlt);
         margin-bottom: 20px;
     }
 </style>

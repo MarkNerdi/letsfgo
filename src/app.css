@@ -1,16 +1,11 @@
-@import url("https://fonts.googleapis.com/css2?family=Noto+Serif&family=Roboto:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap");
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
 :root {
-    --red: #9b1b23;
-    --lightRed: #ffd5d5;
-    --lightGrey: #f3f3f3;
+    --primaryColor: #9b1b23;
     --fontFamily: 'Roboto', sans-serif;
-    --fontFamilyAlt: 'Noto Serif', serif;
-    --gradient: linear-gradient(to right, var(--red), #b84141);
-    --gray: #aaaaaa
 }
 
 *,
@@ -47,14 +42,8 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-main {
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
-}
-
 header {
-    font-family: var(--fontFamilyAlt);
+    font-family: var(--fontFamily);
     font-size: 30px;
     padding: 20px;
 }
@@ -84,12 +73,12 @@ select {
     outline: none;
     resize: none;
     box-shadow: none;
-    border: 2px solid var(--red);
+    border: 2px solid var(--primaryColor);
     border-radius: 5px;
     background-color: white;
     padding: 10px;
     font-size: 16px;
-    font-family: var(--fontFamilyAlt);
+    font-family: var(--fontFamily);
     line-height: 28px;
 }
 
@@ -105,24 +94,8 @@ button {
     width: 80%;
     height: 40px;
     font-weight: 500;
-    background: var(--gradient);
+    background: var(--primaryColor);
     color: white;
-    text-align: center;
-    margin: auto;
-    font-size: 16px;
-    border-radius: 5px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.secondary-button {
-    width: 80%;
-    height: 40px;
-    font-weight: 500;
-    background: white;
-    border: 2px solid var(--gray);
-    color: black;
     text-align: center;
     margin: auto;
     font-size: 16px;

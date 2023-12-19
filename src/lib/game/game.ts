@@ -18,20 +18,21 @@ export class Game {
     public result: GameResult | undefined;
 
 
-    constructor(id: string, settings: GameSettings, result?: GameResult, status: GameStatus = GameStatus.NotStarted) {
+    constructor(id: string, settings: GameSettings) {
         this.id = id;
         this.settings = settings;
-        this.result = result;
 
-        this.boardState = writable(Array.from({ length: settings.height }, () => {
-            return Array.from({ length: settings.width }, () => FieldState.Empty);
-        }));
         this.history = writable([]);
         this.currentPlayer = derived([this.history], ([history]) => {
             return history.length % 2 === 0 ? FieldState.Black : FieldState.White;
         });
-        this.status = writable(status);
+        this.status = writable(GameStatus.NotStarted);
         this.deadStones = writable([]);
+
+
+        this.boardState = writable(Array.from({ length: settings.height }, () => {
+            return Array.from({ length: settings.width }, () => FieldState.Empty);
+        }));
         this.cleanedBoardState = derived([this.boardState, this.deadStones], ([boardState, deadStones]) => {
             const cleanedBoardState: BoardState = structuredClone(boardState);
             deadStones.forEach(stone => {
@@ -42,10 +43,22 @@ export class Game {
     }
 
     static init(dbGame: DBGame): Game {
-        return new Game(String(dbGame._id), dbGame.settings, dbGame.result, dbGame.status);
+        const game = new Game(String(dbGame._id), dbGame.settings);
+        dbGame.history.forEach((move, index) => {
+            if (move.pass) {
+                game.pass();
+            } else {
+                const stone = index % 2 === 0 ? FieldState.Black : FieldState.White;
+                game.setStone(stone, move.x, move.y, false);
+            }
+        });
+        game.status.set(dbGame.status);
+        game.result = dbGame.result;
+
+        return game;
     }
 
-    setStone(stone: FieldState, x: number, y: number): void {
+    setStone(stone: FieldState, x: number, y: number, playSound: boolean = true): void {
         if (x >= this.settings.width || x < 0 || y >= this.settings.height || y < 0) {
             throw Error;
         }
@@ -89,7 +102,9 @@ export class Game {
         }
         unitsToRemove.forEach((_unit) => this.removeUnit(_unit));
 
-        this.playGameSound(!!unitsToRemove.length, didAtari);
+        if (playSound) {
+            this.playGameSound(!!unitsToRemove.length, didAtari);
+        }
     }
 
     pass(): void {
@@ -134,8 +149,6 @@ export class Game {
 
             unit.forEach(_stone => {
                 const deadStoneIndex = stones.findIndex(stone => stone.x === _stone.x && stone.y === _stone.y);
-                console.log(deadStoneIndex);
-
                 if (deadStoneIndex >= 0) {
                     stones.splice(deadStoneIndex, 1);
                 } else {

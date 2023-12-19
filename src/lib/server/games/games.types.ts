@@ -20,5 +20,6 @@ export type Game = {
 export type Move = {
     x: number;
     y: number;
+    pass: boolean;
     time: number
 }

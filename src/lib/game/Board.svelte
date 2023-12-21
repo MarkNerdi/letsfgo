@@ -7,7 +7,6 @@
     export let game: Game | undefined;
     export let color: 'burlywood' | 'white' = 'white';
 
-
     const boardSize = 700;
     const boardPadding = 50;
     $: boardState = game?.boardState;
@@ -21,16 +20,25 @@
             ? getEvaluatedBoardState($cleanedBoardState)
             : undefined;
 
-
     $: columns = boardState && $boardState ? $boardState.length ?? 9 : 9;
     $: rows = boardState && $boardState ? $boardState[0]?.length ?? 9 : 9;
     $: stoneSize = boardSize / Math.max(columns, rows);
 
-
-    function onEmptyClick(x: number, y: number): void {
+    async function onEmptyClick(x: number, y: number): Promise<void> {
         const _currentPlayer = $currentPlayer;
         if (!game || !_currentPlayer) return;
+
         game.setStone(_currentPlayer, x, y);
+
+        await fetch('/api/game/add-move', {
+            method: 'POST',
+            body: JSON.stringify({
+                gameId: game.id,
+                x,
+                y,
+                pass: false,
+            }),
+        }).catch(err => console.error(err));
     }
 
     let hoveredCoordinate: Stone | undefined = undefined;

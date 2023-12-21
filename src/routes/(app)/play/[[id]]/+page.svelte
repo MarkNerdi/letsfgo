@@ -5,6 +5,7 @@
     import Board from '$lib/game/Board.svelte';
     import { GameStatus, PlayerColor, Scoring } from '$lib/game/enums';
     import { Game } from '$lib/game/game';
+    import { browser } from '$app/environment';
 
     export let data: PageData;
 
@@ -12,9 +13,8 @@
 
     $: status = game?.status;
     $: history = game?.history;
-    $: currentPlayer = game?.currentPlayer;
 
-    $: if (data.game) {
+    $: if (data.game && browser) {
         game = Game.init(data.game);
     }
 
@@ -22,8 +22,18 @@
         game?.finishGame();
     }
 
-    function onPassClick(): void {
-        game?.pass();
+    async function onPassClick(): Promise<void> {
+        if (!game) return;
+
+        game.pass();
+
+        await fetch('/api/game/add-move', {
+            method: 'POST',
+            body: JSON.stringify({
+                gameId: game.id,
+                pass: true,
+            }),
+        }).catch(err => console.error(err));
     }
 </script>
 
@@ -53,20 +63,25 @@
                 </history-container>
 
                 {#if $status === GameStatus.InProgress}
-                    <form method="POST" class="controlls">
-                        <input type="hidden" name="gameId" value={game.id} />
-                        <input type="hidden" name="currentPlayer" value={$currentPlayer} />
-                        <button class="primary" on:click={onPassClick}> Pass </button>
+                    <controlls>
+                        <button class="primary" on:click={onPassClick}>
+                            Pass
+                        </button>
                         <div class="w-full flex flex-row gap-4 justify-center items-center">
                             <button on:click={() => console.log('clicked')}> Takeback </button>
                             <button formaction="?/resign"> Resign </button>
                         </div>
-                    </form>
+                    </controlls>
                 {:else if $status === GameStatus.ChooseDeadStones}
-                    <div class="controlls">
+                    <controlls>
                         <h2>Choose Dead stones</h2>
-                        <button class="primary" on:click={onAcceptDeadStonesClick}> Accept </button>
-                    </div>
+                        <button
+                            class="primary"
+                            on:click={onAcceptDeadStonesClick}
+                        >
+                            Accept
+                        </button>
+                    </controlls>
                 {:else}
                     <analysis> hoi do kimmp die analyse </analysis>
                 {/if}
@@ -150,7 +165,7 @@
         @apply flex-grow max-h-40 overflow-y-auto;
     }
 
-    .controlls {
+    controlls {
         @apply flex flex-grow flex-col justify-center items-center gap-4;
     }
 

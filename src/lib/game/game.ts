@@ -134,7 +134,7 @@ export class Game {
     }
 
     getFinalScore(): { black: number, white: number } {
-        return getAreaScoring(get(this.cleanedBoardState));
+        return getAreaScoring(get(this.cleanedBoardState), this.settings.komi);
     }
 
     getWinner(): string {

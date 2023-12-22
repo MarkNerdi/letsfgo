@@ -12,7 +12,7 @@ export async function fetchApi(
 
     if (!response.ok) {
         const error = await response.json();
-        return Promise.reject(error);
+        return Promise.reject(error.message);
     }
 
     const contentType = response.headers.get('content-type');

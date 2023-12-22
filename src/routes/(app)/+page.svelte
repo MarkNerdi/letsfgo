@@ -8,8 +8,12 @@
     };
 
     async function createGame() {
-        const { gameId } = await fetchApi('/api/create-game', 'POST', gameData);
-        goto(`/play/${gameId}`);
+        try {
+            const { gameId } = await fetchApi('/api/create-game', 'POST', gameData);
+            goto(`/play/${gameId}`);
+        } catch (error) {
+            // TODO: Display error
+        }
     }
 </script>
 

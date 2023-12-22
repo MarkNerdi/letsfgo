@@ -9,8 +9,9 @@ type AddMoveRequest = {
     action: string;
 };
 
-export const POST: RequestHandler = (async ({ request }) => {
-    const { gameId, action }: AddMoveRequest = await request.json();
+export const POST: RequestHandler = (async ({ params, request }) => {
+    const gameId = params.id;
+    const { action }: AddMoveRequest = await request.json();
 
     const game = await gameController.getById(gameId);
     if (!game) {

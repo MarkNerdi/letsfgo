@@ -1,5 +1,5 @@
 import type { GameStatus } from '$lib/game/enums';
-import type { GameResult, GameSettings } from '$lib/game/types';
+import type { GameResult, GameSettings, Stone } from '$lib/game/types';
 import type { ObjectId } from 'mongodb';
 
 export type Game = {
@@ -11,6 +11,11 @@ export type Game = {
 
     settings: GameSettings;
     history: Move[];
+
+    deadstonesSelections: {
+        black: Stone[];
+        white: Stone[];
+    }
     result: GameResult | undefined;
     
     createdBy: ObjectId | undefined;

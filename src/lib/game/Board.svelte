@@ -37,10 +37,9 @@
 
         game.setStone(_currentPlayer, x, y);
 
-        await fetch('/api/game/add-move', {
+        await fetch(`/api/game/${game.id}/add-move`, {
             method: 'POST',
             body: JSON.stringify({
-                gameId: game.id,
                 action: `${x},${y}`,
             }),
         }).catch(err => console.error(err));

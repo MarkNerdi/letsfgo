@@ -28,10 +28,9 @@
 
         game.pass();
 
-        await fetch('/api/game/add-move', {
+        await fetch(`/api/game/${game.id}/add-move`, {
             method: 'POST',
             body: JSON.stringify({
-                gameId: game.id,
                 pass: true,
             }),
         }).catch(err => console.error(err));

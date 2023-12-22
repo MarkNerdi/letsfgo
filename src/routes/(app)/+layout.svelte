@@ -1,6 +1,5 @@
 <header>
-    <div>Let's f goooo</div>
-    <a href="/play">Play</a>
+    <div>Let's f go</div>
 </header>
 
 <main class="p-5">

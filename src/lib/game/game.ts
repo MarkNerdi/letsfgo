@@ -1,7 +1,7 @@
 import { derived, get, writable, type Writable, type Readable } from 'svelte/store';
 import { FieldState, GameStatus, Sound } from './enums';
 import type { BoardState, GameResult, GameSettings, Stone, Unit } from './types';
-import { getLibertiesOfUnit, getSurroundingUnitsFromUnit, getUnitContainingCoordinates } from '$lib/game/utils';
+import { getCapturedStonesAfterMove, getLibertiesOfUnit, getSurroundingUnitsFromUnit, getUnitContainingCoordinates } from '$lib/game/utils';
 import { getAreaScoring } from '$lib/game/scorings';
 import { playSound } from '$lib/utils/sound';
 import type { Game as DBGame } from '$lib/server/games/games.types';
@@ -9,14 +9,16 @@ import type { Game as DBGame } from '$lib/server/games/games.types';
 export class Game {
     public id: string;
     public status: Writable<GameStatus>;
-    public boardState: Writable<BoardState>;
+    public boardState: Readable<BoardState>;
     public cleanedBoardState: Readable<BoardState>;
     public deadStones: Writable<Stone[]>;
+    public displayedTurn: Writable<number>;
     public history: Writable<string[]>;
+    public killedStones: Writable<{ black: number, white: number }[]>;
+    public allBoardStates: Writable<BoardState[]>;
     public currentPlayer: Readable<FieldState>;
     public settings: GameSettings;
     public result: GameResult | undefined;
-
 
     constructor(id: string, settings: GameSettings) {
         this.id = id;
@@ -28,11 +30,19 @@ export class Game {
         });
         this.status = writable(GameStatus.NotStarted);
         this.deadStones = writable([]);
+        this.killedStones = writable([]);
+        this.displayedTurn = writable(0);
 
 
-        this.boardState = writable(Array.from({ length: settings.height }, () => {
+        const initialBoardState = Array.from({ length: settings.height }, () => {
             return Array.from({ length: settings.width }, () => FieldState.Empty);
-        }));
+        });
+        this.allBoardStates = writable([initialBoardState]);
+
+        this.boardState = derived([this.allBoardStates, this.displayedTurn], ([allBoardStates, displayedTurn]) => {
+            return allBoardStates[displayedTurn];
+        });
+
         this.cleanedBoardState = derived([this.boardState, this.deadStones], ([boardState, deadStones]) => {
             const cleanedBoardState: BoardState = structuredClone(boardState);
             deadStones.forEach(stone => {
@@ -71,39 +81,35 @@ export class Game {
             history.push(`${x},${y}`);
             return history;
         });
-        this.boardState.update(state => {
-            state[x][y] = stone;
-            return state;
+        this.displayedTurn.set(get(this.history).length);
+
+
+        const currentBoardState = structuredClone(get(this.allBoardStates)[get(this.allBoardStates).length - 1]);
+        currentBoardState[x][y] = stone;
+
+        const { stonesToRemove, didAtari } = getCapturedStonesAfterMove(currentBoardState, x, y);
+        stonesToRemove.forEach(stone => currentBoardState[stone.x][stone.y] = FieldState.Empty);
+
+        this.allBoardStates.update(allBoardStates => {
+            allBoardStates.push(currentBoardState);
+            return allBoardStates;
         });
-
-        const unit = this.getUnitContainingCoordinates(x, y);
-
-        let didAtari = false;
-        const surroundingUnits = this.getSurroundingUnitsFromUnit(unit);
-        const unitsToRemove = [];
-        for (const surroundingUnit of surroundingUnits) {
-            const adjacentLiberties = this.getLibertiesOfUnit(surroundingUnit);
-
-            const isAtari = adjacentLiberties.length === 1;
-            if (isAtari) {
-                didAtari = true;
-                continue;
-            }
-
-            const isCapture = adjacentLiberties.length === 0;
-            if (isCapture) {
-                unitsToRemove.push(surroundingUnit);
-            }
-        }
-
-        const ownLiberties = this.getLibertiesOfUnit(unit);
-        if (!unitsToRemove.length && ownLiberties.length === 0) {
-            unitsToRemove.push(unit);
-        }
-        unitsToRemove.forEach((_unit) => this.removeUnit(_unit));
-
         if (playSound) {
-            this.playGameSound(!!unitsToRemove.length, didAtari);
+            this.playGameSound(!!stonesToRemove.length, didAtari);
+        }
+    }
+
+    setDisplayedTurn(step: 'start' | 'previous' | 'next' | 'end'): void {
+        const history = get(this.history);
+        const displayedTurn = get(this.displayedTurn);
+        if (step === 'start') {
+            this.displayedTurn.set(0);
+        } else if (step === 'previous') {
+            this.displayedTurn.set(Math.max(displayedTurn - 1, 0));
+        } else if (step === 'next') {
+            this.displayedTurn.set(Math.min(displayedTurn + 1, history.length - 1));
+        } else if (step === 'end') {
+            this.displayedTurn.set(history.length - 1);
         }
     }
 
@@ -163,15 +169,6 @@ export class Game {
         this.status.set(GameStatus.Ended);
     }
 
-    removeUnit(unit: Unit): void {
-        this.boardState.update(state => {
-            unit.forEach(stone => {
-                state[stone.x][stone.y] = FieldState.Empty;
-            });
-            return state;
-        });
-    }
-
     playGameSound(didCapture: boolean, didAtari: boolean): void {
         let sound: Sound = Sound.PlaceStone;
         if (didCapture) {
@@ -182,17 +179,5 @@ export class Game {
             sound = Sound.PlaceStone;
         }
         playSound(sound);
-    }
-
-    getSurroundingUnitsFromUnit(unit: Unit): Unit[] {
-        return getSurroundingUnitsFromUnit(unit, get(this.boardState));
-    }
-
-    getUnitContainingCoordinates(x: number, y: number): Unit {
-        return getUnitContainingCoordinates(x, y, get(this.boardState));
-    }
-
-    getLibertiesOfUnit(unit: Unit): Stone[] {
-        return getLibertiesOfUnit(unit, get(this.boardState));
     }
 }

@@ -135,6 +135,35 @@ export function getSurroundingStonesFromUnit(unit: Unit, board: BoardState): Sto
     return stones;
 }
 
+export function getCapturedStonesAfterMove(boardState: BoardState, x: number, y: number): { stonesToRemove: Stone[], didAtari: boolean } {
+    const unit = getUnitContainingCoordinates(x, y, boardState);
+
+    let didAtari = false;
+    const surroundingUnits = getSurroundingUnitsFromUnit(unit, boardState);
+    const stonesToRemove = [];
+    for (const surroundingUnit of surroundingUnits) {
+        const adjacentLiberties = getLibertiesOfUnit(surroundingUnit, boardState);
+
+        const isAtari = adjacentLiberties.length === 1;
+        if (isAtari) {
+            didAtari = true;
+            continue;
+        }
+
+        const isCapture = adjacentLiberties.length === 0;
+        if (isCapture) {
+            stonesToRemove.push(...surroundingUnit);
+        }
+    }
+
+    const ownLiberties = getLibertiesOfUnit(unit, boardState);
+    if (!stonesToRemove.length && ownLiberties.length === 0) {
+        stonesToRemove.push(...unit);
+    }
+
+    return { stonesToRemove, didAtari };
+}
+
 function getAdjacentCoordinates(x: number, y: number, board: BoardState): Stone[] {
     const liberties: Stone[] = [];
     const { width, height } = getDimensionsFromBoardState(board);

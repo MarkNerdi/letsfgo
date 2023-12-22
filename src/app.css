@@ -84,7 +84,6 @@ select {
 
 button {
     border: none;
-    background-color: white;
     font-family: var(--fontFamily);
     display: block;
     padding: 0;

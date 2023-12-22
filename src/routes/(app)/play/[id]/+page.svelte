@@ -34,7 +34,24 @@
             }),
         }).catch(err => console.error(err));
     }
+
+    function onKey(event: KeyboardEvent): void {
+        if (!game) return;
+
+        if (event.key === 'ArrowUp') {
+            game.setDisplayedTurn('start');
+        } else if (event.key === 'ArrowDown') {
+            game.setDisplayedTurn('end');
+        } else if (event.key === 'ArrowLeft') {
+            game.setDisplayedTurn('previous');
+        } else if (event.key === 'ArrowRight') {
+            game.setDisplayedTurn('next');
+        }
+    }
 </script>
+
+
+<svelte:window on:keydown={onKey} />
 
 <play-view>
     <game-container>
@@ -59,6 +76,17 @@
             <history-container>
                 <HistoryOverview history={$history} />
             </history-container>
+             <current-move-buttons>
+                <button on:click={() => game?.setDisplayedTurn('start')}>Start</button>
+                <button on:click={() => game?.setDisplayedTurn('previous')}>Previous</button>
+                <button on:click={() => game?.setDisplayedTurn('next')}>Next</button>
+                <button
+                    class="primary"
+                    on:click={() => game?.setDisplayedTurn('end')}
+                >
+                    {GameStatus.InProgress ? 'Current' : 'End'}
+                </button>
+            </current-move-buttons>
             {#if $status === GameStatus.InProgress}
                 <form method="POST" class="controlls">
                     <button class="primary" on:click={onPassClick}>Pass</button>
@@ -94,7 +122,7 @@
     </side-container>
 </play-view>
 
-<style lang="postcss">
+<style lang="postcss" scoped>
     play-view {
         @apply w-full h-full;
         @apply flex justify-center items-center gap-4;
@@ -147,8 +175,17 @@
         @apply flex-grow max-h-40 overflow-y-auto;
     }
 
+    current-move-buttons {
+        @apply flex flex-row justify-between items-center gap-1 p-1;
+        @apply bg-white;
+
+        button {
+            @apply w-full;
+        }
+    }
+
     controlls {
-        @apply flex flex-grow flex-col justify-center items-center gap-4;
+        @apply flex flex-grow flex-col justify-center items-center gap-4 p-4;
     }
 
     button {
@@ -156,7 +193,6 @@
         @apply bg-gray-500 text-white cursor-pointer;
 
         &.primary {
-            @apply px-5 py-3;
             @apply bg-blue-500;
         }
     }

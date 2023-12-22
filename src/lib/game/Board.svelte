@@ -130,7 +130,7 @@
     </inner-game-board>
 </outer-game-board>
 
-<style lang="postcss">
+<style lang="postcss" scoped>
     outer-game-board {
         @apply flex justify-center items-center gap-4;
         @apply border border-solid border-gray-500;

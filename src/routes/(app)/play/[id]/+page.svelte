@@ -7,6 +7,7 @@
     import { browser } from '$app/environment';
     import type { Writable } from 'svelte/store';
     import type { GameSettings } from '$lib/game/types.js';
+    import { onDestroy } from 'svelte';
 
     export let data;
 
@@ -48,6 +49,31 @@
             game.setDisplayedTurn('next');
         }
     }
+
+    let intervalId: number | undefined = undefined;
+    $: {
+        clearInterval(intervalId);
+        intervalId = setInterval(async () => {
+            if (!game) {
+                return;
+            }
+
+            const gameInfo = await fetch(`/api/game/${game.id}/game-state`, { method: 'GET' });
+            if (!gameInfo.ok) {
+                return;
+            }
+            const data = await gameInfo.json();
+            const { history, status, result } = data.gameState;
+
+            game.updateHistory(history);
+            game.status.set(status);
+            game.result.set(result);
+        }, 1000);
+    }
+
+    onDestroy(() => {
+        clearInterval(intervalId);
+    });
 </script>
 
 
@@ -88,18 +114,18 @@
                 </button>
             </current-move-buttons>
             {#if $status === GameStatus.InProgress}
-                <form method="POST" class="controlls">
+                <controlls>
                     <button class="primary" on:click={onPassClick}>Pass</button>
                     <div class="w-full flex flex-row gap-4 justify-center items-center">
                         <button>Takeback</button>
                         <button formaction="?/resign">Resign</button>
                     </div>
-                </form>
+                </controlls>
             {:else if $status === GameStatus.ChooseDeadStones}
-                <div class="controlls">
+                <controlls>
                     <h2>Choose Dead stones</h2>
                     <button class="primary" on:click={finishGame}> Accept </button>
-                </div>
+                </controlls>
             {:else}
                 <analysis>hoi do kimmp die analyse</analysis>
             {/if}

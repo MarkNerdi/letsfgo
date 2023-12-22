@@ -6,13 +6,11 @@ import { GameStatus } from '$lib/game/enums';
 
 type AddMoveRequest = {
     gameId: string;
-    x: number;
-    y: number;
-    pass: boolean;
+    action: string;
 };
 
 export const POST: RequestHandler = (async ({ request }) => {
-    const { gameId, x, y, pass }: AddMoveRequest = await request.json();
+    const { gameId, action }: AddMoveRequest = await request.json();
 
     const game = await gameController.getById(gameId);
     if (!game) {
@@ -20,13 +18,18 @@ export const POST: RequestHandler = (async ({ request }) => {
     }
 
     const move: Move = {
-        x,
-        y,
-        pass,
+        action,
         time: Date.now(),
     };
     const updatedHistory = [...game.history, move];
 
-    await gameController.update(gameId, { status: GameStatus.InProgress, history: updatedHistory });
+    const [secondLast, last] = updatedHistory.slice(-2);
+
+    let status = GameStatus.InProgress;
+    if (secondLast?.action === 'pass' && last?.action === 'pass') {
+        status = GameStatus.ChooseDeadStones;
+    }
+
+    await gameController.update(gameId, { status, history: updatedHistory });
     return json({ success: true });
 });

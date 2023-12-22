@@ -1,10 +1,10 @@
 import { derived, get, writable, type Writable, type Readable } from 'svelte/store';
 import { FieldState, GameStatus, Sound } from './enums';
 import type { BoardState, GameResult, GameSettings, Stone, Unit } from './types';
-import { getCapturedStonesAfterMove, getLibertiesOfUnit, getSurroundingUnitsFromUnit, getUnitContainingCoordinates } from '$lib/game/utils';
+import { getCapturedStonesAfterMove } from '$lib/game/utils';
 import { getAreaScoring } from '$lib/game/scorings';
 import { playSound } from '$lib/utils/sound';
-import type { Game as DBGame } from '$lib/server/games/games.types';
+import type { Game as DBGame, Move } from '$lib/server/games/games.types';
 
 export class Game {
     public id: string;
@@ -18,7 +18,7 @@ export class Game {
     public allBoardStates: Writable<BoardState[]>;
     public currentPlayer: Readable<FieldState>;
     public settings: GameSettings;
-    public result: GameResult | undefined;
+    public result: Writable<GameResult | undefined>;
 
     constructor(id: string, settings: GameSettings) {
         this.id = id;
@@ -30,6 +30,7 @@ export class Game {
         });
         this.status = writable(GameStatus.NotStarted);
         this.deadStones = writable([]);
+        this.result = writable(undefined);
         this.killedStones = writable([]);
         this.displayedTurn = writable(0);
 
@@ -54,16 +55,10 @@ export class Game {
 
     static init(dbGame: DBGame): Game {
         const game = new Game(String(dbGame._id), dbGame.settings);
-        dbGame.history.forEach((move, index) => {
-            if (move.pass) {
-                game.pass();
-            } else {
-                const stone = index % 2 === 0 ? FieldState.Black : FieldState.White;
-                game.setStone(stone, move.x, move.y, false);
-            }
-        });
+        game.updateHistory(dbGame.history, false);
+
         game.status.set(dbGame.status);
-        game.result = dbGame.result;
+        game.result.set(dbGame.result);
 
         return game;
     }
@@ -73,7 +68,7 @@ export class Game {
             throw Error;
         }
 
-        if (get(this.history).length === 0) {
+        if (get(this.status) === GameStatus.NotStarted) {
             this.status.set(GameStatus.InProgress);
         }
 
@@ -114,7 +109,7 @@ export class Game {
     }
 
     pass(): void {
-        if (get(this.history).length === 0) {
+        if (get(this.status) === GameStatus.NotStarted) {
             this.status.set(GameStatus.InProgress);
         }
 
@@ -145,6 +140,25 @@ export class Game {
     getWinner(): string {
         const { black, white } = this.getFinalScore();
         return black > white ? 'Black' : 'White';
+    }
+
+    updateHistory(history: Move[], playSound = true): void {
+        if (history.length === get(this.history).length) {
+            return;
+        }
+
+        if (history.length > get(this.history).length) {
+            for (let i = get(this.history).length; i < history.length; i++) {
+                const move = history[i];
+                if (move.action === 'pass') {
+                    this.pass();
+                } else {
+                    const [x, y] = move.action.split(',').map(Number);
+                    const stone = i % 2 === 0 ? FieldState.Black : FieldState.White;
+                    this.setStone(stone, x, y, playSound);
+                }
+            }
+        }
     }
 
     addOrRemoveDeadStones(unit: Unit): void {

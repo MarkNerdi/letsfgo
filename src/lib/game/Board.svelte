@@ -13,7 +13,7 @@
 
 
     let status: Writable<GameStatus> = game.status;
-    let boardState: Writable<BoardState> = game.boardState; 
+    let boardState: Readable<BoardState> = game.boardState; 
     let cleanedBoardState: Readable<BoardState> = game.cleanedBoardState;
     let currentPlayer: Readable<FieldState> = game.currentPlayer;
     let deadStones: Writable<Stone[]> = game.deadStones;
@@ -22,6 +22,8 @@
         ({ boardState, cleanedBoardState, currentPlayer, deadStones, status } = game);
     }
 
+    $: console.log($status);
+    
     $: evaluatedBoardState =
         $status === GameStatus.ChooseDeadStones ? getEvaluatedBoardState($cleanedBoardState) : undefined;
 
@@ -39,9 +41,7 @@
             method: 'POST',
             body: JSON.stringify({
                 gameId: game.id,
-                x,
-                y,
-                pass: false,
+                action: `${x},${y}`,
             }),
         }).catch(err => console.error(err));
     }
@@ -81,47 +81,52 @@
             {#each Array(columns) as _, index}
                 {#each Array(rows) as _, index2}
                     <board-item class="h-full w-full">
-                        {#if $status === GameStatus.ChooseDeadStones && evaluatedBoardState}
-                            <button
-                                class="choose-unit"
-                                on:click={() => onUnitClick(index, index2)}
-                                on:mouseleave={() => (hoveredCoordinate = undefined)}
-                                on:mouseenter={() => (hoveredCoordinate = { x: index, y: index2 })}
-                            >
-                                {#if $boardState[index][index2] === FieldState.Empty}
-                                    <evaluated-field
-                                        class:black={evaluatedBoardState[index][index2] === FieldState.Black}
-                                        class:white={evaluatedBoardState[index][index2] === FieldState.White}
-                                    />
-                                {:else}
+                        {#if !boardState || !$boardState}
+                            <!-- empty -->
+                        {:else if $status === GameStatus.ChooseDeadStones && evaluatedBoardState}
+                            {#if $boardState[index][index2] !== FieldState.Empty}
+                                {@const isHovered = hoveredUnit?.some(
+                                    (stone) => stone.x === index && stone.y === index2
+                                )}
+                                {@const isDead = $deadStones?.some(
+                                    (stone) => stone.x === index && stone.y === index2
+                                )}
+                                <button class="choose-unit"
+                                    on:click={() => onUnitClick(index, index2)}
+                                    on:mouseleave={() => (hoveredCoordinate = undefined)}
+                                    on:mouseenter={() => (hoveredCoordinate = { x: index, y: index2 })}
+                                >
                                     <stone
                                         class:black={$boardState[index][index2] === FieldState.Black}
-                                        class:hovered={hoveredUnit?.some(
-                                            (stone) => stone.x === index && stone.y === index2
-                                        )}
-                                        class:dead={$deadStones.some(
-                                            (stone) => stone.x === index && stone.y === index2
-                                        )}
+                                        class:hovered={isHovered}
+                                        class:dead={isDead}
                                     >
                                         <evaluated-field
                                             class:black={evaluatedBoardState[index][index2] === FieldState.Black}
                                             class:white={evaluatedBoardState[index][index2] === FieldState.White}
                                         />
                                     </stone>
-                                {/if}
-                            </button>
+                                </button>
+                            {:else}
+                                <evaluated-field
+                                    class:black={evaluatedBoardState[index][index2] === FieldState.Black}
+                                    class:white={evaluatedBoardState[index][index2] === FieldState.White}
+                                />
+                            {/if}
                         {:else if $status === GameStatus.Ended}
-                            {#if $cleanedBoardState[index][index2] !== FieldState.Empty}
+                            {#if $cleanedBoardState && $cleanedBoardState[index][index2] !== FieldState.Empty}
                                 <stone class:black={$cleanedBoardState[index][index2] === FieldState.Black} />
                             {:else}
                                 <!-- else content here -->
                             {/if}
-                        {:else if $boardState[index][index2] === FieldState.Empty}
-                            <button class="place-stone" on:click={() => onEmptyClick(index, index2)}>
-                                <stone class:black={$currentPlayer === FieldState.Black} />
-                            </button>
                         {:else}
-                            <stone class:black={$boardState[index][index2] === FieldState.Black} />
+                            {#if $boardState[index][index2] === FieldState.Empty}
+                                <button class="place-stone" on:click={() => onEmptyClick(index, index2)}>
+                                    <stone class:black={$currentPlayer === FieldState.Black} />
+                                </button>
+                            {:else}
+                                <stone class:black={$boardState[index][index2] === FieldState.Black} />
+                            {/if}
                         {/if}
                     </board-item>
                 {/each}

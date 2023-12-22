@@ -9,7 +9,7 @@
 
     async function createGame() {
         try {
-            const { gameId } = await fetchApi('/api/create-game', 'POST', gameData);
+            const { gameId } = await fetchApi('/api/game/create', 'POST', gameData);
             goto(`/play/${gameId}`);
         } catch (error) {
             // TODO: Display error

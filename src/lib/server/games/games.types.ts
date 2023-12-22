@@ -18,8 +18,6 @@ export type Game = {
 };
 
 export type Move = {
-    x: number;
-    y: number;
-    pass: boolean;
+    action: string;
     time: number
 }

@@ -11,11 +11,10 @@
     export let data;
 
     let game: Game = Game.init(data.game);
-    let status: Writable<GameStatus>;
-    let history: Writable<string[]>; 
-    let settings: GameSettings;
-    let finishGame: () => void;
-     
+    let status: Writable<GameStatus> = game.status;
+    let history: Writable<string[]> = game.history; 
+    let settings: GameSettings = game.settings;
+    let finishGame: () => void = game.finishGame;
 
     $: if (data.game && browser) {
         game = Game.init(data.game);

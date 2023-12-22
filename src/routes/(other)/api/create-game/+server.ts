@@ -35,6 +35,6 @@ export const POST: RequestHandler = (async ({ request }) => {
     if (game) {
         return json({ gameId: game._id });
     } else {
-        return error(400, 'Komi muss eine positive Zahl sein.');
+        return error(500, 'Something went wrong.');
     }
 });

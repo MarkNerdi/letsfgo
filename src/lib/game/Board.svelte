@@ -1,7 +1,8 @@
 <script lang="ts">
     import type { Game } from '$lib/game/game';
-    import type { Stone } from '$lib/game/types';
+    import type { BoardState, Stone } from '$lib/game/types';
     import { getEvaluatedBoardState, getUnitContainingCoordinates } from '$lib/game/utils';
+    import type { Readable, Writable } from 'svelte/store';
     import { FieldState, GameStatus } from './enums';
 
     export let game: Game;
@@ -10,7 +11,16 @@
     const boardSize = 700;
     const boardPadding = 50;
 
-    const { boardState, cleanedBoardState, currentPlayer, deadStones, status } = game;
+
+    let status: Writable<GameStatus> = game.status;
+    let boardState: Writable<BoardState> = game.boardState; 
+    let cleanedBoardState: Readable<BoardState> = game.cleanedBoardState;
+    let currentPlayer: Readable<FieldState> = game.currentPlayer;
+    let deadStones: Writable<Stone[]> = game.deadStones;
+
+    $: if (game) {
+        ({ boardState, cleanedBoardState, currentPlayer, deadStones, status } = game);
+    }
 
     $: evaluatedBoardState =
         $status === GameStatus.ChooseDeadStones ? getEvaluatedBoardState($cleanedBoardState) : undefined;
@@ -35,7 +45,7 @@
             }),
         }).catch(err => console.error(err));
     }
-    
+
     let hoveredCoordinate: Stone | undefined = undefined;
     $: hoveredUnit = hoveredCoordinate
         ? getUnitContainingCoordinates(hoveredCoordinate?.x, hoveredCoordinate?.y, $boardState)

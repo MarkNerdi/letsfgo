@@ -13,13 +13,14 @@
 
     let game: Game = Game.init(data.game);
     let status: Writable<GameStatus> = game.status;
+    let displayedTurn: Writable<number> = game.displayedTurn;
     let history: Writable<string[]> = game.history; 
     let settings: GameSettings = game.settings;
     let finishGame: () => void = game.finishGame;
 
     $: if (data.game && browser) {
         game = Game.init(data.game);
-        ({ status, history, settings, finishGame } = game);
+        ({ status, history, settings, displayedTurn, finishGame } = game);
     }
 
     async function onPassClick(): Promise<void> {
@@ -100,15 +101,19 @@
                 <div>23.03.2023</div>
             </game-info>
             <history-container>
-                <HistoryOverview history={$history} />
+                <HistoryOverview
+                    history={$history}
+                    currentTurn={$displayedTurn}
+                    onTurnClick={(index) => game.displayedTurn.set(index)}
+                />
             </history-container>
              <current-move-buttons>
-                <button on:click={() => game?.setDisplayedTurn('start')}>Start</button>
-                <button on:click={() => game?.setDisplayedTurn('previous')}>Previous</button>
-                <button on:click={() => game?.setDisplayedTurn('next')}>Next</button>
+                <button on:click={() => game.setDisplayedTurn('start')}>Start</button>
+                <button on:click={() => game.setDisplayedTurn('previous')}>Previous</button>
+                <button on:click={() => game.setDisplayedTurn('next')}>Next</button>
                 <button
                     class="primary"
-                    on:click={() => game?.setDisplayedTurn('end')}
+                    on:click={() => game.setDisplayedTurn('end')}
                 >
                     {GameStatus.InProgress ? 'Current' : 'End'}
                 </button>

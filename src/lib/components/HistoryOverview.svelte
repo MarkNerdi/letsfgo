@@ -15,7 +15,7 @@
 <history-overview>
     {#each formattedHistory as item, index}
         <div class="flex flex-row gap-1 items-center">
-            <button on:click={() => onTurnClick(index)} class:current={index === currentTurn}>
+            <button on:click={() => onTurnClick(index + 1)} class:current={index === currentTurn - 1}>
                 <p>{index + 1}.</p>
                 <stone class:black={index % 2 === 0} />
                 <p>{item}</p>

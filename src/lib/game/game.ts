@@ -102,9 +102,9 @@ export class Game {
         } else if (step === 'previous') {
             this.displayedTurn.set(Math.max(displayedTurn - 1, 0));
         } else if (step === 'next') {
-            this.displayedTurn.set(Math.min(displayedTurn + 1, history.length - 1));
+            this.displayedTurn.set(Math.min(displayedTurn + 1, history.length));
         } else if (step === 'end') {
-            this.displayedTurn.set(history.length - 1);
+            this.displayedTurn.set(history.length);
         }
     }
 

@@ -1,25 +1,25 @@
 <script lang="ts">
-    import type { PageData } from './$types.ts';
     import HistoryOverview from '$lib/components/HistoryOverview.svelte';
     import PlayerInfo from '$lib/components/PlayerInfo.svelte';
     import Board from '$lib/game/Board.svelte';
-    import { GameStatus, PlayerColor, Scoring } from '$lib/game/enums';
+    import { GameStatus, PlayerColor } from '$lib/game/enums';
     import { Game } from '$lib/game/game';
     import { browser } from '$app/environment';
+    import type { Writable } from 'svelte/store';
+    import type { GameSettings } from '$lib/game/types.js';
 
-    export let data: PageData;
+    export let data;
 
-    let game: Game | undefined = undefined;
-
-    $: status = game?.status;
-    $: history = game?.history;
+    let game: Game = Game.init(data.game);
+    let status: Writable<GameStatus>;
+    let history: Writable<string[]>; 
+    let settings: GameSettings;
+    let finishGame: () => void;
+     
 
     $: if (data.game && browser) {
         game = Game.init(data.game);
-    }
-
-    function onAcceptDeadStonesClick(): void {
-        game?.finishGame();
+        ({ status, history, settings, finishGame } = game);
     }
 
     async function onPassClick(): Promise<void> {
@@ -41,62 +41,47 @@
     <game-container>
         <player-section>
             <PlayerInfo color={PlayerColor.Black} name="Player 2" rank="2d" />
-            <div>03: 03</div>
+            <div>03:03</div>
         </player-section>
         <Board bind:game />
         <player-section>
             <PlayerInfo color={PlayerColor.White} name="Player 1" rank="1d" />
-            <div>03: 03</div>
+            <div>03:03</div>
         </player-section>
     </game-container>
 
     <side-container>
-        {#if game}
-            <game-info-box>
-                <game-info>
-                    <div>Rapid - 5+0</div>
-                    <div>9x9</div>
-                    <div>23.03.2023</div>
-                </game-info>
-                <history-container>
-                    <HistoryOverview history={$history} />
-                </history-container>
+        <game-info-box>
+            <game-info>
+                <div>Rapid - {settings.initialTime}+{settings.increment}</div>
+                <div>{settings.width}x{settings.height}</div>
+                <div>23.03.2023</div>
+            </game-info>
+            <history-container>
+                <HistoryOverview history={$history} />
+            </history-container>
+            {#if $status === GameStatus.InProgress}
+                <form method="POST" class="controlls">
+                    <button class="primary" on:click={onPassClick}>Pass</button>
+                    <div class="w-full flex flex-row gap-4 justify-center items-center">
+                        <button>Takeback</button>
+                        <button formaction="?/resign">Resign</button>
+                    </div>
+                </form>
+            {:else if $status === GameStatus.ChooseDeadStones}
+                <div class="controlls">
+                    <h2>Choose Dead stones</h2>
+                    <button class="primary" on:click={finishGame}> Accept </button>
+                </div>
+            {:else}
+                <analysis>hoi do kimmp die analyse</analysis>
+            {/if}
+        </game-info-box>
 
-                {#if $status === GameStatus.InProgress}
-                    <controlls>
-                        <button class="primary" on:click={onPassClick}>
-                            Pass
-                        </button>
-                        <div class="w-full flex flex-row gap-4 justify-center items-center">
-                            <button on:click={() => console.log('clicked')}> Takeback </button>
-                            <button formaction="?/resign"> Resign </button>
-                        </div>
-                    </controlls>
-                {:else if $status === GameStatus.ChooseDeadStones}
-                    <controlls>
-                        <h2>Choose Dead stones</h2>
-                        <button
-                            class="primary"
-                            on:click={onAcceptDeadStonesClick}
-                        >
-                            Accept
-                        </button>
-                    </controlls>
-                {:else}
-                    <analysis> hoi do kimmp die analyse </analysis>
-                {/if}
-            </game-info-box>
-        {/if}
-
+        <!-- Todo: Remove form -->
         <bottom-box>
             <form method="POST" action="?/startGame">
-                <input type="hidden" name="width" value={9} />
-                <input type="hidden" name="height" value={9} />
-                <input type="hidden" name="initialTime" value={5} />
-                <input type="hidden" name="increment" value={3} />
-                <input type="hidden" name="komi" value={3} />
-                <input type="hidden" name="scoring" value={Scoring.Area} />
-                {#if game && $status === GameStatus.Ended}
+                {#if $status === GameStatus.Ended}
                     <h2>
                         {game.getWinner()} won!
                     </h2>
@@ -104,8 +89,6 @@
                         <button class="primary" formaction="?/rematch">Rematch</button>
                         <button class="primary">New opponent</button>
                     </div>
-                {:else if !game}
-                    <button class="primary">Lets GOOOOOO</button>
                 {/if}
             </form>
         </bottom-box>

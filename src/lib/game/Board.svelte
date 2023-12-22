@@ -4,24 +4,19 @@
     import { getEvaluatedBoardState, getUnitContainingCoordinates } from '$lib/game/utils';
     import { FieldState, GameStatus } from './enums';
 
-    export let game: Game | undefined;
+    export let game: Game;
     export let color: 'burlywood' | 'white' = 'white';
 
     const boardSize = 700;
     const boardPadding = 50;
-    $: boardState = game?.boardState;
-    $: cleanedBoardState = game?.cleanedBoardState;
-    $: currentPlayer = game?.currentPlayer;
-    $: deadStones = game?.deadStones;
-    $: gameStatus = game?.status;
+
+    const { boardState, cleanedBoardState, currentPlayer, deadStones, status } = game;
 
     $: evaluatedBoardState =
-        cleanedBoardState && $cleanedBoardState && $gameStatus === GameStatus.ChooseDeadStones
-            ? getEvaluatedBoardState($cleanedBoardState)
-            : undefined;
+        $status === GameStatus.ChooseDeadStones ? getEvaluatedBoardState($cleanedBoardState) : undefined;
 
-    $: columns = boardState && $boardState ? $boardState.length ?? 9 : 9;
-    $: rows = boardState && $boardState ? $boardState[0]?.length ?? 9 : 9;
+    $: columns = $boardState.length ? 9 : 9;
+    $: rows = $boardState[0]?.length ? 9 : 9;
     $: stoneSize = boardSize / Math.max(columns, rows);
 
     async function onEmptyClick(x: number, y: number): Promise<void> {
@@ -40,20 +35,15 @@
             }),
         }).catch(err => console.error(err));
     }
-
+    
     let hoveredCoordinate: Stone | undefined = undefined;
-    $: hoveredUnit =
-        hoveredCoordinate && $boardState
-            ? getUnitContainingCoordinates(hoveredCoordinate?.x, hoveredCoordinate?.y, $boardState)
-            : undefined;
+    $: hoveredUnit = hoveredCoordinate
+        ? getUnitContainingCoordinates(hoveredCoordinate?.x, hoveredCoordinate?.y, $boardState)
+        : undefined;
 
     function onUnitClick(x: number, y: number): void {
-        const _boardState = $boardState;
-        if (!_boardState || !game) return;
-
-        if (_boardState[x][y] === FieldState.Empty) return;
-
-        const unit = getUnitContainingCoordinates(x, y, _boardState);
+        if ($boardState[x][y] === FieldState.Empty) return;
+        const unit = getUnitContainingCoordinates(x, y, $boardState);
         game.addOrRemoveDeadStones(unit);
     }
 </script>
@@ -81,9 +71,7 @@
             {#each Array(columns) as _, index}
                 {#each Array(rows) as _, index2}
                     <board-item class="h-full w-full">
-                        {#if !boardState || !$boardState}
-                            <!-- empty -->
-                        {:else if $gameStatus === GameStatus.ChooseDeadStones && evaluatedBoardState}
+                        {#if $status === GameStatus.ChooseDeadStones && evaluatedBoardState}
                             <button
                                 class="choose-unit"
                                 on:click={() => onUnitClick(index, index2)}
@@ -96,16 +84,14 @@
                                         class:white={evaluatedBoardState[index][index2] === FieldState.White}
                                     />
                                 {:else}
-                                    {@const isHovered = hoveredUnit?.some(
-                                        (stone) => stone.x === index && stone.y === index2
-                                    )}
-                                    {@const isDead = $deadStones?.some(
-                                        (stone) => stone.x === index && stone.y === index2
-                                    )}
                                     <stone
                                         class:black={$boardState[index][index2] === FieldState.Black}
-                                        class:hovered={isHovered}
-                                        class:dead={isDead}
+                                        class:hovered={hoveredUnit?.some(
+                                            (stone) => stone.x === index && stone.y === index2
+                                        )}
+                                        class:dead={$deadStones.some(
+                                            (stone) => stone.x === index && stone.y === index2
+                                        )}
                                     >
                                         <evaluated-field
                                             class:black={evaluatedBoardState[index][index2] === FieldState.Black}
@@ -114,8 +100,8 @@
                                     </stone>
                                 {/if}
                             </button>
-                        {:else if $gameStatus === GameStatus.Ended}
-                            {#if $cleanedBoardState && $cleanedBoardState[index][index2] !== FieldState.Empty}
+                        {:else if $status === GameStatus.Ended}
+                            {#if $cleanedBoardState[index][index2] !== FieldState.Empty}
                                 <stone class:black={$cleanedBoardState[index][index2] === FieldState.Black} />
                             {:else}
                                 <!-- else content here -->

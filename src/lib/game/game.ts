@@ -1,5 +1,5 @@
 import { derived, get, writable, type Writable, type Readable } from 'svelte/store';
-import { FieldState, GameStatus, Sound } from './enums';
+import { GameStatus, PlayerColor, Sound } from './enums';
 import type { BoardState, GameResult, GameSettings, Stone, Unit } from './types';
 import { getCapturedStonesAfterMove } from '$lib/game/utils';
 import { getAreaScoring } from '$lib/game/scorings';
@@ -16,7 +16,7 @@ export class Game {
     public history: Writable<string[]>;
     public killedStones: Writable<{ black: number, white: number }[]>;
     public allBoardStates: Writable<BoardState[]>;
-    public currentTurn: Readable<FieldState>;
+    public currentTurn: Readable<PlayerColor>;
     public settings: GameSettings;
     public result: Writable<GameResult | undefined>;
 
@@ -26,7 +26,7 @@ export class Game {
 
         this.history = writable([]);
         this.currentTurn = derived([this.history], ([history]) => {
-            return history.length % 2 === 0 ? FieldState.Black : FieldState.White;
+            return history.length % 2 === 0 ? PlayerColor.Black : PlayerColor.White;
         });
         this.status = writable(GameStatus.NotStarted);
         this.deadStones = writable([]);
@@ -35,8 +35,8 @@ export class Game {
         this.displayedTurn = writable(0);
 
 
-        const initialBoardState = Array.from({ length: settings.height }, () => {
-            return Array.from({ length: settings.width }, () => FieldState.Empty);
+        const initialBoardState: BoardState = Array.from({ length: settings.height }, () => {
+            return Array.from({ length: settings.width }, () => undefined);
         });
         this.allBoardStates = writable([initialBoardState]);
 
@@ -47,7 +47,7 @@ export class Game {
         this.cleanedBoardState = derived([this.boardState, this.deadStones], ([boardState, deadStones]) => {
             const cleanedBoardState: BoardState = structuredClone(boardState);
             deadStones.forEach(stone => {
-                cleanedBoardState[stone.x][stone.y] = FieldState.Empty;
+                cleanedBoardState[stone.x][stone.y] = undefined;
             });
             return cleanedBoardState;
         });
@@ -63,7 +63,7 @@ export class Game {
         return game;
     }
 
-    setStone(stone: FieldState, x: number, y: number, playSound: boolean = true): void {
+    setStone(stone: PlayerColor, x: number, y: number, playSound: boolean = true): void {
         if (x >= this.settings.width || x < 0 || y >= this.settings.height || y < 0) {
             throw Error;
         }
@@ -83,7 +83,7 @@ export class Game {
         currentBoardState[x][y] = stone;
 
         const { stonesToRemove, didAtari } = getCapturedStonesAfterMove(currentBoardState, x, y);
-        stonesToRemove.forEach(stone => currentBoardState[stone.x][stone.y] = FieldState.Empty);
+        stonesToRemove.forEach(stone => currentBoardState[stone.x][stone.y] = undefined);
 
         this.allBoardStates.update(allBoardStates => {
             allBoardStates.push(currentBoardState);
@@ -154,7 +154,7 @@ export class Game {
                     this.pass();
                 } else {
                     const [x, y] = move.action.split(',').map(Number);
-                    const stone = i % 2 === 0 ? FieldState.Black : FieldState.White;
+                    const stone = i % 2 === 0 ? PlayerColor.Black : PlayerColor.White;
                     this.setStone(stone, x, y, playSound);
                 }
             }

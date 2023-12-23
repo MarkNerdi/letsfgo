@@ -1,6 +1,6 @@
-import type { FieldState, PlayerColor, ResultType, Scoring } from './enums';
+import type { PlayerColor, ResultType, Scoring } from './enums';
 
-export type BoardState = FieldState[][]
+export type BoardState = (PlayerColor | undefined)[][]
 
 export type Stone = {
     x: number,

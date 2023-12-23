@@ -1,10 +1,10 @@
-import { FieldState } from '$lib/game/enums';
+import { PlayerColor } from '$lib/game/enums';
 import type { BoardState, GameSettings, Stone, Unit } from '$lib/game/types';
 
 export function getEvaluatedBoardState(boardState: BoardState): BoardState {
     const { width, height } = getDimensionsFromBoardState(boardState);
     const evaluatedBoardState: BoardState = Array.from({ length: height }, () => {
-        return Array.from({ length: width }, () => FieldState.Empty);
+        return Array.from({ length: width }, () => undefined);
     });
     const visited: { [key: string]: boolean } = {};
 
@@ -15,7 +15,10 @@ export function getEvaluatedBoardState(boardState: BoardState): BoardState {
                 continue;
             }
 
-            if (field === FieldState.Empty) {
+            if (field) {
+                visited[`${index},${index2}`] = true;
+                evaluatedBoardState[index][index2] = field;
+            } else {
                 const unit = getUnitContainingCoordinates(index, index2, boardState);
                 const surroundingStones = getSurroundingStonesFromUnit(unit, boardState);
                 const surroundingColors = [...new Set(surroundingStones.map(stone => boardState[stone.x][stone.y]))];
@@ -23,11 +26,8 @@ export function getEvaluatedBoardState(boardState: BoardState): BoardState {
                 unit.forEach(stone => {
 
                     visited[`${stone.x},${stone.y}`] = true;
-                    evaluatedBoardState[stone.x][stone.y] = surroundingColors.length === 1 ? surroundingColors[0] : FieldState.Empty;
+                    evaluatedBoardState[stone.x][stone.y] = surroundingColors.length === 1 ? surroundingColors[0] : undefined;
                 });
-            } else {
-                visited[`${index},${index2}`] = true;
-                evaluatedBoardState[index][index2] = field;
             }
         }
     }
@@ -35,22 +35,22 @@ export function getEvaluatedBoardState(boardState: BoardState): BoardState {
 }
 
 export function getBoardStateFromHistory(history: string[], stones: Stone[], settings: GameSettings): BoardState {
-    const boardState = Array.from({ length: settings.height }, () => {
-        return Array.from({ length: settings.width }, () => FieldState.Empty);
+    const boardState: BoardState = Array.from({ length: settings.height }, () => {
+        return Array.from({ length: settings.width }, () => undefined);
     });
 
     for (const [index, move] of history.entries()) {
         if (move === 'pass') {
             continue;
         }
-        const stone = index % 2 === 0 ? FieldState.Black : FieldState.White;
+        const stone = index % 2 === 0 ? PlayerColor.Black : PlayerColor.White;
         const [x, y] = move.split(',').map(Number);
 
         boardState[x][y] = stone;
         const { stonesToRemove } = getCapturedStonesAfterMove(boardState, x, y);
-        stonesToRemove.forEach(stone => boardState[stone.x][stone.y] = FieldState.Empty);
+        stonesToRemove.forEach(stone => boardState[stone.x][stone.y] = undefined);
     }
-    stones.forEach(stone => boardState[stone.x][stone.y] = FieldState.Empty);
+    stones.forEach(stone => boardState[stone.x][stone.y] = undefined);
 
     return boardState;
 }
@@ -98,7 +98,7 @@ export function getLibertiesOfUnit(unit: Unit, board: BoardState): Stone[] {
             }
 
             visited[`${adjacent.x},${adjacent.y}`] = true;
-            if (board[adjacent.x][adjacent.y] === FieldState.Empty) {
+            if (board[adjacent.x][adjacent.y] === undefined) {
                 liberties.push(adjacent);
             }
         });
@@ -142,7 +142,7 @@ export function getSurroundingStonesFromUnit(unit: Unit, board: BoardState): Sto
             }
 
             visited[`${adjacent.x},${adjacent.y}`] = true;
-            if (board[adjacent.x][adjacent.y] === color || board[adjacent.x][adjacent.y] === FieldState.Empty) {
+            if (board[adjacent.x][adjacent.y] === color || board[adjacent.x][adjacent.y] === undefined) {
                 return;
             }
 

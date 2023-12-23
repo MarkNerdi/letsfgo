@@ -3,9 +3,10 @@
     import type { BoardState, Stone } from '$lib/game/types';
     import { getEvaluatedBoardState, getUnitContainingCoordinates } from '$lib/game/utils';
     import type { Readable, Writable } from 'svelte/store';
-    import { FieldState, GameStatus } from './enums';
+    import { FieldState, GameStatus, PlayerColor } from './enums';
 
     export let game: Game;
+    export let player: Readable<PlayerColor>;
     export let color: 'burlywood' | 'white' = 'white';
 
     const boardSize = 700;
@@ -15,11 +16,11 @@
     let status: Writable<GameStatus> = game.status;
     let boardState: Readable<BoardState> = game.boardState; 
     let cleanedBoardState: Readable<BoardState> = game.cleanedBoardState;
-    let currentPlayer: Readable<FieldState> = game.currentPlayer;
     let deadStones: Writable<Stone[]> = game.deadStones;
+    let currentTurn: Readable<PlayerColor> = game.currentTurn;
 
     $: if (game) {
-        ({ boardState, cleanedBoardState, currentPlayer, deadStones, status } = game);
+        ({ boardState, cleanedBoardState, deadStones, status, currentTurn } = game);
     }
 
     $: console.log($status);
@@ -32,10 +33,9 @@
     $: stoneSize = boardSize / Math.max(columns, rows);
 
     async function onEmptyClick(x: number, y: number): Promise<void> {
-        const _currentPlayer = $currentPlayer;
-        if (!game || !_currentPlayer) return;
+        if (!game) return;
 
-        game.setStone(_currentPlayer, x, y);
+        game.setStone($player, x, y);
 
         await fetch(`/api/game/${game.id}/add-move`, {
             method: 'POST',
@@ -120,9 +120,13 @@
                             {/if}
                         {:else}
                             {#if $boardState[index][index2] === FieldState.Empty}
-                                <button class="place-stone" on:click={() => onEmptyClick(index, index2)}>
-                                    <stone class:black={$currentPlayer === FieldState.Black} />
-                                </button>
+                                {#if $player === $currentTurn}
+                                    <button class="place-stone" on:click={() => onEmptyClick(index, index2)}>
+                                        <stone class:black={$player === FieldState.Black} />
+                                    </button>
+                                {:else}
+                                    <div />
+                                {/if}
                             {:else}
                                 <stone class:black={$boardState[index][index2] === FieldState.Black} />
                             {/if}

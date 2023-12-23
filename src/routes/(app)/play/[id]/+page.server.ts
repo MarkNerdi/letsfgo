@@ -4,12 +4,14 @@ import { gameController } from '$lib/server/games/games.controller.ts';
 import { GameStatus, PlayerColor, ResultType, Scoring } from '$lib/game/enums.ts';
 import type { GameResult, GameSettings } from '$lib/game/types.ts';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, url }) => {
     const game = await gameController.getById(params.id);
     if (!game) {
         throw redirect(303, '/');
     }
-    return { game };
+    const player = url.searchParams.get('player');
+
+    return { game, player };
 };
 
 export const actions: Actions = {

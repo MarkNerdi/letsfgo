@@ -5,7 +5,7 @@
     import { GameStatus, PlayerColor } from '$lib/game/enums';
     import { Game } from '$lib/game/game';
     import { browser } from '$app/environment';
-    import type { Writable } from 'svelte/store';
+    import { get, readable, type Writable } from 'svelte/store';
     import type { GameSettings } from '$lib/game/types.js';
     import { onDestroy } from 'svelte';
 
@@ -16,11 +16,12 @@
     let displayedTurn: Writable<number> = game.displayedTurn;
     let history: Writable<string[]> = game.history; 
     let settings: GameSettings = game.settings;
-    let finishGame: () => void = game.finishGame;
+    let player = data.player ? readable(data.player === 'black' ? PlayerColor.Black : PlayerColor.White) : game.currentTurn;
 
     $: if (data.game && browser) {
         game = Game.init(data.game);
-        ({ status, history, settings, displayedTurn, finishGame } = game);
+        player = data.player ? readable(data.player === 'black' ? PlayerColor.Black : PlayerColor.White) : game.currentTurn;
+        ({ status, history, settings, displayedTurn } = game);
     }
 
     async function onPassClick(): Promise<void> {
@@ -97,7 +98,7 @@
             <PlayerInfo color={PlayerColor.Black} name="Player 2" rank="2d" />
             <div>03:03</div>
         </player-section>
-        <Board bind:game />
+        <Board bind:game {player} />
         <player-section>
             <PlayerInfo color={PlayerColor.White} name="Player 1" rank="1d" />
             <div>03:03</div>

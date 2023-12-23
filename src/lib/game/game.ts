@@ -16,7 +16,7 @@ export class Game {
     public history: Writable<string[]>;
     public killedStones: Writable<{ black: number, white: number }[]>;
     public allBoardStates: Writable<BoardState[]>;
-    public currentPlayer: Readable<FieldState>;
+    public currentTurn: Readable<FieldState>;
     public settings: GameSettings;
     public result: Writable<GameResult | undefined>;
 
@@ -25,7 +25,7 @@ export class Game {
         this.settings = settings;
 
         this.history = writable([]);
-        this.currentPlayer = derived([this.history], ([history]) => {
+        this.currentTurn = derived([this.history], ([history]) => {
             return history.length % 2 === 0 ? FieldState.Black : FieldState.White;
         });
         this.status = writable(GameStatus.NotStarted);

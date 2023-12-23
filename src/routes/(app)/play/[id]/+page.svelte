@@ -31,7 +31,19 @@
         await fetch(`/api/game/${game.id}/add-move`, {
             method: 'POST',
             body: JSON.stringify({
-                pass: true,
+                action: 'pass',
+            }),
+        }).catch(err => console.error(err));
+    }
+
+    async function onDeadStonesAcceptClick(): Promise<void> {
+        if (!game) return;
+
+        await fetch(`/api/game/${game.id}/set-dead-stones`, {
+            method: 'POST',
+            body: JSON.stringify({
+                stones: get(game.deadStones),
+                playerColor: $player,
             }),
         }).catch(err => console.error(err));
     }
@@ -128,7 +140,7 @@
             {:else if $status === GameStatus.ChooseDeadStones}
                 <controlls>
                     <h2>Choose Dead stones</h2>
-                    <button class="primary" on:click={finishGame}> Accept </button>
+                    <button class="primary" on:click={onDeadStonesAcceptClick}> Accept </button>
                 </controlls>
             {:else}
                 <analysis>hoi do kimmp die analyse</analysis>

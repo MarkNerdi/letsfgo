@@ -1,5 +1,5 @@
 import { FieldState } from '$lib/game/enums';
-import type { BoardState, Stone, Unit } from '$lib/game/types';
+import type { BoardState, GameSettings, Stone, Unit } from '$lib/game/types';
 
 export function getEvaluatedBoardState(boardState: BoardState): BoardState {
     const { width, height } = getDimensionsFromBoardState(boardState);
@@ -32,6 +32,27 @@ export function getEvaluatedBoardState(boardState: BoardState): BoardState {
         }
     }
     return evaluatedBoardState;
+}
+
+export function getBoardStateFromHistory(history: string[], stones: Stone[], settings: GameSettings): BoardState {
+    const boardState = Array.from({ length: settings.height }, () => {
+        return Array.from({ length: settings.width }, () => FieldState.Empty);
+    });
+
+    for (const [index, move] of history.entries()) {
+        if (move === 'pass') {
+            continue;
+        }
+        const stone = index % 2 === 0 ? FieldState.Black : FieldState.White;
+        const [x, y] = move.split(',').map(Number);
+
+        boardState[x][y] = stone;
+        const { stonesToRemove } = getCapturedStonesAfterMove(boardState, x, y);
+        stonesToRemove.forEach(stone => boardState[stone.x][stone.y] = FieldState.Empty);
+    }
+    stones.forEach(stone => boardState[stone.x][stone.y] = FieldState.Empty);
+
+    return boardState;
 }
 
 export function getUnitContainingCoordinates(x: number, y: number, board: BoardState): Unit {

@@ -4,6 +4,7 @@ import { gameController } from '$lib/server/games/games.controller';
 import { GameStatus, PlayerColor, ResultType } from '$lib/game/enums';
 import type { GameResult, Stone } from '$lib/game/types';
 import { getAreaScoring } from '$lib/game/scorings';
+import { getBoardStateFromHistory } from '$lib/game/utils';
 
 type SetDeadStonesRequest = {
     stones: Stone[];
@@ -26,22 +27,20 @@ export const POST: RequestHandler = (async ({ params, request }) => {
         deadStones.white = stones;
     }
 
-    if (deadStones.black === undefined || deadStones.white === undefined) {
+    if (!deadStones.black || !deadStones.white) {
         await gameController.update(gameId, { deadstonesSelections: deadStones });
         return json({ success: true });
-    } else {
-        const cleanedBoardState = game.history.filter((move) => move.action !== 'pass');
-
-        const scoring = getAreaScoring(cleanedBoardState, game.settings.komi);
-
-        const result: GameResult = {
-            type: ResultType.ByScore,
-            deadStones: stones,
-            points: scoring,
-            winner: scoring.black > scoring.white ? PlayerColor.Black : PlayerColor.White,
-        };
-        await gameController.update(gameId, { deadstonesSelections: deadStones, status: GameStatus.Ended });
-        return json({ success: true });
     }
+    
+    const boardState = getBoardStateFromHistory(game.history.map(move => move.action), stones, game.settings);
+    const scoring = getAreaScoring(boardState, game.settings.komi);
 
+    const result: GameResult = {
+        type: ResultType.ByScore,
+        deadStones: stones,
+        points: scoring,
+        winner: scoring.black > scoring.white ? PlayerColor.Black : PlayerColor.White,
+    };
+    await gameController.update(gameId, { deadstonesSelections: deadStones, status: GameStatus.Ended, result });
+    return json({ success: true });
 });

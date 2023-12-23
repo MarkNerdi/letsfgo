@@ -12,8 +12,8 @@ async function create(settings: GameSettings): Promise<Game | null> {
         status: GameStatus.NotStarted,
         history: [],
         deadstonesSelections: {
-            black: [],
-            white: [],
+            black: undefined,
+            white: undefined,
         },
         result: undefined,
         settings,

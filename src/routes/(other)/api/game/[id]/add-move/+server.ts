@@ -26,7 +26,7 @@ export const POST: RequestHandler = (async ({ params, request }) => {
 
     const [secondLast, last] = updatedHistory.slice(-2);
 
-    let status = GameStatus.InProgress;
+    let status = GameStatus.InProgress;    
     if (secondLast?.action === 'pass' && last?.action === 'pass') {
         status = GameStatus.ChooseDeadStones;
     }

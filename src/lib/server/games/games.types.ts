@@ -13,8 +13,8 @@ export type Game = {
     history: Move[];
 
     deadstonesSelections: {
-        black: Stone[];
-        white: Stone[];
+        black: Stone[] | undefined;
+        white: Stone[] | undefined;
     }
     result: GameResult | undefined;
     

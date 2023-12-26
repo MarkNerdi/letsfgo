@@ -117,6 +117,13 @@ export class Game {
             history.push('pass');
             return history;
         });
+        this.displayedTurn.set(get(this.history).length);
+
+        const currentBoardState = structuredClone(get(this.allBoardStates)[get(this.allBoardStates).length - 1]);
+        this.allBoardStates.update(allBoardStates => {
+            allBoardStates.push(currentBoardState);
+            return allBoardStates;
+        });
 
         const [secondLast, last] = get(this.history).slice(-2);
         if (secondLast === 'pass' && last === 'pass') {

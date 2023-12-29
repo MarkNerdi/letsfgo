@@ -1,7 +1,7 @@
 import { derived, get, writable, type Writable, type Readable } from 'svelte/store';
 import { GameStatus, PlayerColor, ResultType, Sound } from './enums';
 import type { BoardState, GameResult, GameSettings, Stone, Unit } from './types';
-import { getCapturedStonesAfterMove, getPlayerByTurn } from '$lib/game/utils';
+import { getPlayerByTurn, placeStone } from '$lib/game/utils';
 import { getAreaScoring } from '$lib/game/scorings';
 import { playSound } from '$lib/utils/sound';
 import type { Game as DBGame, Move } from '$lib/server/games/games.types';
@@ -81,17 +81,18 @@ export class Game {
 
 
         const currentBoardState = structuredClone(get(this.allBoardStates)[get(this.allBoardStates).length - 1]);
-        currentBoardState[x][y] = stone;
+        const {
+            atari,
+            capturedStones,
+        } = placeStone(currentBoardState, x, y, stone);
 
-        const { stonesToRemove, didAtari } = getCapturedStonesAfterMove(currentBoardState, x, y);
-        stonesToRemove.forEach(stone => currentBoardState[stone.x][stone.y] = undefined);
 
         this.allBoardStates.update(allBoardStates => {
             allBoardStates.push(currentBoardState);
             return allBoardStates;
         });
         if (playSound) {
-            this.playGameSound(!!stonesToRemove.length, didAtari);
+            this.playGameSound(!!capturedStones.length, atari);
         }
     }
 

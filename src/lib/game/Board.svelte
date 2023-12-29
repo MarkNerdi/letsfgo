@@ -4,6 +4,7 @@
     import { getEvaluatedBoardState, getUnitContainingCoordinates } from '$lib/game/utils';
     import type { Readable, Writable } from 'svelte/store';
     import { GameStatus, PlayerColor } from './enums';
+    import { getValidNextMoves } from '$lib/game/validation';
 
     export let game: Game;
     export let player: Readable<PlayerColor>;
@@ -15,12 +16,13 @@
 
     let status: Writable<GameStatus> = game.status;
     let boardState: Readable<BoardState> = game.boardState; 
+    let history: Writable<string[]> = game.history; 
     let cleanedBoardState: Readable<BoardState> = game.cleanedBoardState;
     let deadStones: Writable<Stone[]> = game.deadStones;
     let currentTurn: Readable<PlayerColor> = game.currentTurn;
 
     $: if (game) {
-        ({ boardState, cleanedBoardState, deadStones, status, currentTurn } = game);
+        ({ boardState, cleanedBoardState, deadStones, status, currentTurn, history } = game);
     }
 
     $: evaluatedBoardState =
@@ -29,6 +31,7 @@
     $: columns = $boardState.length ? 9 : 9;
     $: rows = $boardState[0]?.length ? 9 : 9;
     $: stoneSize = boardSize / Math.max(columns, rows);
+    $: validNextMoves = getValidNextMoves($boardState, $history, $currentTurn);
 
     async function onEmptyClick(x: number, y: number): Promise<void> {
         if (!game) return;
@@ -123,9 +126,14 @@
                         {:else}
                             {#if $boardState[index][index2] === undefined}
                                 {#if $player === $currentTurn}
-                                    <button class="place-stone" on:click={() => onEmptyClick(index, index2)}>
-                                        <stone class:black={$player === PlayerColor.Black} />
-                                    </button>
+                                    {#if validNextMoves[index][index2]}
+                                        <button class="place-stone" on:click={() => onEmptyClick(index, index2)}>
+                                            <stone class:black={$player === PlayerColor.Black} />
+                                        </button>
+                                    {:else}
+                                        <!-- TODO: Add errorstate -->
+                                        <div />
+                                    {/if}
                                 {:else}
                                     <div />
                                 {/if}

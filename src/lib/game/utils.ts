@@ -1,5 +1,5 @@
 import { PlayerColor } from '$lib/game/enums';
-import type { BoardState, GameSettings, Stone, Unit } from '$lib/game/types';
+import type { BoardState, Stone, Unit } from '$lib/game/types';
 
 export function getEvaluatedBoardState(boardState: BoardState): BoardState {
     const { width, height } = getDimensionsFromBoardState(boardState);
@@ -34,9 +34,21 @@ export function getEvaluatedBoardState(boardState: BoardState): BoardState {
     return evaluatedBoardState;
 }
 
-export function getBoardStateFromHistory(history: string[], stones: Stone[], settings: GameSettings): BoardState {
-    const boardState: BoardState = Array.from({ length: settings.height }, () => {
-        return Array.from({ length: settings.width }, () => undefined);
+export function placeStone(boardState: BoardState, x: number, y: number, stone: PlayerColor): { atari: boolean, capturedStones: Stone[] } {
+    boardState[x][y] = stone;
+
+    const { stonesToRemove, didAtari } = getCapturedStonesAfterMove(boardState, x, y);
+    stonesToRemove.forEach(stone => boardState[stone.x][stone.y] = undefined);
+
+    return {
+        atari: didAtari,
+        capturedStones: stonesToRemove,
+    };
+}
+
+export function getBoardStateFromHistory(history: string[], stones: Stone[], dimensions: { width: number, height: number }): BoardState {
+    const boardState: BoardState = Array.from({ length: dimensions.height }, () => {
+        return Array.from({ length: dimensions.width }, () => undefined);
     });
 
     for (const [index, move] of history.entries()) {
@@ -46,9 +58,7 @@ export function getBoardStateFromHistory(history: string[], stones: Stone[], set
         const stone = getPlayerByTurn(index);
         const [x, y] = move.split(',').map(Number);
 
-        boardState[x][y] = stone;
-        const { stonesToRemove } = getCapturedStonesAfterMove(boardState, x, y);
-        stonesToRemove.forEach(stone => boardState[stone.x][stone.y] = undefined);
+        placeStone(boardState, x, y, stone);
     }
     stones.forEach(stone => boardState[stone.x][stone.y] = undefined);
 
@@ -136,16 +146,15 @@ export function getSurroundingStonesFromUnit(unit: Unit, board: BoardState): Sto
             return;
         }
         const adjacentCoordinates = getAdjacentCoordinates(stone.x, stone.y, board);
+        
         adjacentCoordinates.forEach(adjacent => {
             if (visited[`${adjacent.x},${adjacent.y}`]) {
                 return;
             }
-
             visited[`${adjacent.x},${adjacent.y}`] = true;
-            if (board[adjacent.x][adjacent.y] === color || board[adjacent.x][adjacent.y] === undefined) {
+            if (board[adjacent.y][adjacent.x] === color || board[adjacent.y][adjacent.x] === undefined) {
                 return;
             }
-
             stones.push(adjacent);
         });
 
@@ -162,6 +171,7 @@ export function getCapturedStonesAfterMove(boardState: BoardState, x: number, y:
     let didAtari = false;
     const surroundingUnits = getSurroundingUnitsFromUnit(unit, boardState);
     const stonesToRemove = [];
+
     for (const surroundingUnit of surroundingUnits) {
         const adjacentLiberties = getLibertiesOfUnit(surroundingUnit, boardState);
 

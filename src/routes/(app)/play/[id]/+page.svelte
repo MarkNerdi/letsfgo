@@ -47,6 +47,16 @@
                 player: $player,
             }),
         }).catch(err => console.error(err));
+
+        if (!data.player) {
+            await fetch(`/api/game/${game.id}/set-dead-stones`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    stones: get(game.deadStones),
+                    player: $player === PlayerColor.Black ? PlayerColor.White : PlayerColor.Black,
+                }),
+            }).catch(err => console.error(err));
+        }
     }
 
     function onKey(event: KeyboardEvent): void {

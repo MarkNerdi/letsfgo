@@ -44,7 +44,7 @@
             method: 'POST',
             body: JSON.stringify({
                 stones: get(game.deadStones),
-                playerColor: $player,
+                player: $player,
             }),
         }).catch(err => console.error(err));
     }

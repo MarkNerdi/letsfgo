@@ -24,7 +24,7 @@
     }
 
     $: evaluatedBoardState =
-        $status === GameStatus.ChooseDeadStones ? getEvaluatedBoardState($cleanedBoardState) : undefined;
+        $status === GameStatus.ChooseDeadStones || $status === GameStatus.Ended ? getEvaluatedBoardState($cleanedBoardState) : undefined;
 
     $: columns = $boardState.length ? 9 : 9;
     $: rows = $boardState[0]?.length ? 9 : 9;
@@ -81,6 +81,8 @@
                         {#if !boardState || !$boardState}
                             <!-- empty -->
                         {:else if $status === GameStatus.ChooseDeadStones && evaluatedBoardState}
+                            {@const isBlack = evaluatedBoardState[index][index2] === PlayerColor.Black}
+                            {@const isWhite = evaluatedBoardState[index][index2] === PlayerColor.White}
                             {#if $boardState[index][index2] !== undefined}
                                 {@const isHovered = hoveredUnit?.some(
                                     (stone) => stone.x === index && stone.y === index2
@@ -98,23 +100,25 @@
                                         class:hovered={isHovered}
                                         class:dead={isDead}
                                     >
-                                        <evaluated-field
-                                            class:black={evaluatedBoardState[index][index2] === PlayerColor.Black}
-                                            class:white={evaluatedBoardState[index][index2] === PlayerColor.White}
-                                        />
+                                        <evaluated-field class:black={isBlack} class:white={isWhite} />
                                     </stone>
                                 </button>
+                            {:else}
+                                <evaluated-field class:black={isBlack} class:white={isWhite} />
+                            {/if}
+                        {:else if $status === GameStatus.Ended && evaluatedBoardState}
+                            {#if cleanedBoardState && $cleanedBoardState[index][index2] !== undefined}
+                                <stone class:black={$cleanedBoardState[index][index2] === PlayerColor.Black}>
+                                    <evaluated-field
+                                        class:black={evaluatedBoardState[index][index2] === PlayerColor.Black}
+                                        class:white={evaluatedBoardState[index][index2] === PlayerColor.White}
+                                    />
+                                </stone>
                             {:else}
                                 <evaluated-field
                                     class:black={evaluatedBoardState[index][index2] === PlayerColor.Black}
                                     class:white={evaluatedBoardState[index][index2] === PlayerColor.White}
                                 />
-                            {/if}
-                        {:else if $status === GameStatus.Ended}
-                            {#if $cleanedBoardState && $cleanedBoardState[index][index2] !== undefined}
-                                <stone class:black={$cleanedBoardState[index][index2] === PlayerColor.Black} />
-                            {:else}
-                                <!-- else content here -->
                             {/if}
                         {:else}
                             {#if $boardState[index][index2] === undefined}

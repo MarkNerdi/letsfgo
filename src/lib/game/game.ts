@@ -1,5 +1,5 @@
 import { derived, get, writable, type Writable, type Readable } from 'svelte/store';
-import { GameStatus, PlayerColor, Sound } from './enums';
+import { GameStatus, PlayerColor, ResultType, Sound } from './enums';
 import type { BoardState, GameResult, GameSettings, Stone, Unit } from './types';
 import { getCapturedStonesAfterMove } from '$lib/game/utils';
 import { getAreaScoring } from '$lib/game/scorings';
@@ -59,6 +59,9 @@ export class Game {
 
         game.status.set(dbGame.status);
         game.result.set(dbGame.result);
+        if (dbGame.result?.type === ResultType.ByScore) {
+            game.deadStones.set(dbGame.result.deadStones);
+        }
 
         return game;
     }

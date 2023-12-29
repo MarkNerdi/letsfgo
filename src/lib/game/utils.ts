@@ -15,7 +15,7 @@ export function getEvaluatedBoardState(boardState: BoardState): BoardState {
                 continue;
             }
 
-            if (field) {
+            if (field !== undefined) {
                 visited[`${index},${index2}`] = true;
                 evaluatedBoardState[index][index2] = field;
             } else {

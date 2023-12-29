@@ -41,6 +41,6 @@ export const POST: RequestHandler = (async ({ params, request }) => {
         points: scoring,
         winner: scoring.black > scoring.white ? PlayerColor.Black : PlayerColor.White,
     };
-    await gameController.update(gameId, { deadstonesSelections: deadStones, status: GameStatus.Ended, result });
-    return json({ success: true });
+    const updatedGame = await gameController.update(gameId, { deadstonesSelections: deadStones, status: GameStatus.Ended, result });
+    return json({ success: true, game: updatedGame });
 });

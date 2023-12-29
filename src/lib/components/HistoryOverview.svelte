@@ -1,4 +1,7 @@
 <script lang="ts">
+    import { PlayerColor } from '$lib/game/enums';
+    import { getPlayerByTurn } from '$lib/game/utils';
+
     export let history: string[] = [];
     export let currentTurn: number = 0;
     export let onTurnClick: (index: number) => void = () => {};
@@ -17,7 +20,7 @@
         <div class="flex flex-row gap-1 items-center">
             <button on:click={() => onTurnClick(index + 1)} class:current={index === currentTurn - 1}>
                 <p>{index + 1}.</p>
-                <stone class:black={index % 2 === 0} />
+                <stone class:black={getPlayerByTurn(index) === PlayerColor.Black} />
                 <p>{item}</p>
             </button>
 

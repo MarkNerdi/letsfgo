@@ -43,7 +43,7 @@ export function getBoardStateFromHistory(history: string[], stones: Stone[], set
         if (move === 'pass') {
             continue;
         }
-        const stone = index % 2 === 0 ? PlayerColor.Black : PlayerColor.White;
+        const stone = getPlayerByTurn(index);
         const [x, y] = move.split(',').map(Number);
 
         boardState[x][y] = stone;
@@ -208,4 +208,8 @@ export function getDimensionsFromBoardState(board: BoardState): { width: number,
         width: board.length,
         height: board[0].length,
     };
+}
+
+export function getPlayerByTurn(turn: number): PlayerColor {
+    return turn % 2 === 0 ? PlayerColor.Black : PlayerColor.White;
 }

@@ -1,7 +1,7 @@
 import { derived, get, writable, type Writable, type Readable } from 'svelte/store';
 import { GameStatus, PlayerColor, ResultType, Sound } from './enums';
 import type { BoardState, GameResult, GameSettings, Stone, Unit } from './types';
-import { getCapturedStonesAfterMove } from '$lib/game/utils';
+import { getCapturedStonesAfterMove, getPlayerByTurn } from '$lib/game/utils';
 import { getAreaScoring } from '$lib/game/scorings';
 import { playSound } from '$lib/utils/sound';
 import type { Game as DBGame, Move } from '$lib/server/games/games.types';
@@ -25,9 +25,7 @@ export class Game {
         this.settings = settings;
 
         this.history = writable([]);
-        this.currentTurn = derived([this.history], ([history]) => {
-            return history.length % 2 === 0 ? PlayerColor.Black : PlayerColor.White;
-        });
+        this.currentTurn = derived([this.history], ([history]) => getPlayerByTurn(history.length));
         this.status = writable(GameStatus.NotStarted);
         this.deadStones = writable([]);
         this.result = writable(undefined);
@@ -158,13 +156,13 @@ export class Game {
         }
 
         if (history.length > get(this.history).length) {
-            for (let i = get(this.history).length; i < history.length; i++) {
-                const move = history[i];
+            for (let turn = get(this.history).length; turn < history.length; turn++) {
+                const move = history[turn];
                 if (move.action === 'pass') {
                     this.pass();
                 } else {
                     const [x, y] = move.action.split(',').map(Number);
-                    const stone = i % 2 === 0 ? PlayerColor.Black : PlayerColor.White;
+                    const stone = getPlayerByTurn(turn);
                     this.setStone(stone, x, y, playSound);
                 }
             }

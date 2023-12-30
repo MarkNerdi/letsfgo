@@ -86,7 +86,6 @@ export class Game {
             capturedStones,
         } = placeStone(currentBoardState, x, y, stone);
 
-
         this.allBoardStates.update(allBoardStates => {
             allBoardStates.push(currentBoardState);
             return allBoardStates;

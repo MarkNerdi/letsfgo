@@ -146,13 +146,12 @@ export function getSurroundingStonesFromUnit(unit: Unit, board: BoardState): Sto
             return;
         }
         const adjacentCoordinates = getAdjacentCoordinates(stone.x, stone.y, board);
-        
         adjacentCoordinates.forEach(adjacent => {
             if (visited[`${adjacent.x},${adjacent.y}`]) {
                 return;
             }
             visited[`${adjacent.x},${adjacent.y}`] = true;
-            if (board[adjacent.y][adjacent.x] === color || board[adjacent.y][adjacent.x] === undefined) {
+            if (board[adjacent.x][adjacent.y] === color || board[adjacent.x][adjacent.y] === undefined) {
                 return;
             }
             stones.push(adjacent);

@@ -4,8 +4,8 @@ import { getBoardStateFromHistory, getDimensionsFromBoardState, placeStone } fro
 
 export function getValidNextMoves(board: BoardState, history: string[], nextPlayerColor: PlayerColor): boolean[][] {
     const { width, height } = getDimensionsFromBoardState(board);
-    const validMoves: boolean[][] = Array.from({ length: height }, () => {
-        return Array.from({ length: width }, () => false);
+    const validMoves: boolean[][] = Array.from({ length: width }, () => {
+        return Array.from({ length: height }, () => false);
     });
     const visited: { [key: string]: boolean } = {};
 
@@ -41,14 +41,12 @@ export function getValidNextMoves(board: BoardState, history: string[], nextPlay
 }
 
 function isKo(board: BoardState, history: string[], x: number, y: number): boolean {
-    const potentialKoTurn = history.findLastIndex(move => move === `${x},${y}`);
-
-    if (potentialKoTurn === -1) {
+    const alreadyPlayedOnce = history.some(move => move === `${x},${y}`);
+    if (!alreadyPlayedOnce) {
         return false;
     }
 
     const dimensions = getDimensionsFromBoardState(board);
-    const potentialKoBoard = getBoardStateFromHistory(history.slice(0, potentialKoTurn + 1), [], dimensions);
-
+    const potentialKoBoard = getBoardStateFromHistory(history.slice(0, history.length - 1), [], dimensions);
     return JSON.stringify(potentialKoBoard) === JSON.stringify(board);
 }

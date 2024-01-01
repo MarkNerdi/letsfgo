@@ -90,12 +90,13 @@ button {
 }
 
 .primary-button {
-    width: 80%;
-    height: 40px;
     font-weight: 500;
+    padding: 8px 16px;
+    flex-shrink: 0;
     background: var(--primaryColor);
     color: white;
     text-align: center;
+    text-wrap: none;
     margin: auto;
     font-size: 16px;
     border-radius: 5px;

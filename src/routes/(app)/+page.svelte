@@ -1,6 +1,7 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { fetchApi } from '$lib/utils/api';
+    import { activeUser } from '$lib/stores/user.store';
 
     const gameData = {
         columns: 9,
@@ -28,14 +29,12 @@
     </box>
     <button class="primary-button" on:click={createGame}>Start game</button>
 </game-settings>
+<h2>Hello {$activeUser?.name}</h2>
 
 <style lang="postcss">
     game-settings {
         @apply w-[300px];
         @apply flex justify-center items-center gap-4;
-
-        background-color: white;
-        border: lightgrey;
 
         box {
             width: 100px;

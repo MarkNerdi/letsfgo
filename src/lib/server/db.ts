@@ -5,14 +5,6 @@ import { MongoClient } from 'mongodb';
 const client = new MongoClient(PRIVATE_DB_CONNECTION_STRING);
 export const db = client.db();
 
-export async function connectToDatabase() {
-    try {
-        await client.connect();
-        console.log('Connected to mongodb');
-
-    } catch (error) {
-        console.log(error);
-    }
-}
+export const mongoClient = client.connect();
 
 export const gameCollection = db.collection<Game>('game');

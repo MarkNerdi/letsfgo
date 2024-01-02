@@ -17,5 +17,6 @@ export const handle = SvelteKitAuth({
         }),
     ],
     adapter: MongoDBAdapter(mongoClient, { databaseName: PRIVATE_DB_NAME }),
+    trustHost: true,
     secret: AUTH_SECRET,
 });

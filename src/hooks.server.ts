@@ -4,7 +4,8 @@ import { MongoDBAdapter } from '@auth/mongodb-adapter';
 import {
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
-    PRIVATE_DB_NAME
+    PRIVATE_DB_NAME,
+    AUTH_SECRET
 } from '$env/static/private';
 import { mongoClient } from '$lib/server/db';
 
@@ -16,5 +17,5 @@ export const handle = SvelteKitAuth({
         }),
     ],
     adapter: MongoDBAdapter(mongoClient, { databaseName: PRIVATE_DB_NAME }),
-
+    secret: AUTH_SECRET,
 });

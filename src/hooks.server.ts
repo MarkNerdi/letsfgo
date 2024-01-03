@@ -14,6 +14,17 @@ export const handle = SvelteKitAuth({
         GoogleProvider({
             clientId: GOOGLE_CLIENT_ID,
             clientSecret: GOOGLE_CLIENT_SECRET,
+            profile(profile) {
+                const defaultUserName = profile.email.split('@')[0];
+
+                return {
+                    id: profile.id,
+                    name: profile.name,
+                    email: profile.email,
+                    username: defaultUserName,
+                    createdAt: Date.now(),
+                };
+            },
         }),
     ],
     adapter: MongoDBAdapter(mongoClient, { databaseName: PRIVATE_DB_NAME }),

@@ -44,6 +44,13 @@ export const handle = SvelteKitAuth({
             },
         }),
     ],
+    callbacks: {
+        async session({ session, user }) {
+            session.user = user;
+            
+            return session;
+        },
+    },
     adapter: MongoDBAdapter(mongoClient, { databaseName: PRIVATE_DB_NAME }),
     trustHost: true,
     secret: AUTH_SECRET,

@@ -4,21 +4,21 @@
     import { signOut } from '@auth/sveltekit/client';
 
 </script>
+
 <header>
     <div>Let's f go</div>
     
     <div>
+        {#if !$activeUser}
+            <button class="primary-button" on:click={() => goto('/auth/signin')}>
+                Login
+            </button>
+        {/if}
 
-    {#if !$activeUser}
-        <button class="primary-button" on:click={() => goto('auth/signin')}>
-            Login
-        </button>
-    {/if}
-
-    {#if $activeUser}
-        <button class="primary-button" on:click={() => signOut()}>
-            Logout
-        </button>
+        {#if $activeUser}
+            <button class="primary-button" on:click={() => signOut()}>
+                Logout
+            </button>
         {/if}
     </div>
 </header>
@@ -33,5 +33,9 @@
         @apply flex justify-between items-center gap-4;
         @apply bg-white;
         @apply border-b border-solid border-gray-200;
+    }
+
+    main {
+        @apply h-full w-full;
     }
 </style>

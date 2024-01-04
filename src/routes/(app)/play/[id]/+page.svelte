@@ -8,6 +8,7 @@
     import { get, readable, type Writable } from 'svelte/store';
     import type { GameSettings } from '$lib/game/types.js';
     import { onDestroy } from 'svelte';
+    import { fetchApi } from '$lib/utils/api.js';
 
     export let data;
 
@@ -29,33 +30,31 @@
 
         game.pass();
 
-        await fetch(`/api/game/${game.id}/add-move`, {
-            method: 'POST',
-            body: JSON.stringify({
-                action: 'pass',
-            }),
-        }).catch(err => console.error(err));
+        await fetchApi(`/api/game/${game.id}/add-move`,
+            'POST',
+            { action: 'pass' }
+        ).catch(err => console.error(err));
     }
 
     async function onDeadStonesAcceptClick(): Promise<void> {
         if (!game) return;
 
-        await fetch(`/api/game/${game.id}/set-dead-stones`, {
-            method: 'POST',
-            body: JSON.stringify({
+        await fetchApi(`/api/game/${game.id}/set-dead-stones`,
+            'POST', 
+            {
                 stones: get(game.deadStones),
                 player: $player,
-            }),
-        }).catch(err => console.error(err));
+            }
+        ).catch(err => console.error(err));
 
         if (!data.player) {
-            await fetch(`/api/game/${game.id}/set-dead-stones`, {
-                method: 'POST',
-                body: JSON.stringify({
+            await fetchApi(`/api/game/${game.id}/set-dead-stones`, 
+                'POST',
+                {
                     stones: get(game.deadStones),
                     player: $player === PlayerColor.Black ? PlayerColor.White : PlayerColor.Black,
-                }),
-            }).catch(err => console.error(err));
+                }
+            ).catch(err => console.error(err));
         }
     }
 

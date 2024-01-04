@@ -5,10 +5,13 @@ import type { Game } from '$lib/server/games/games.types';
 import { ObjectId, type UpdateResult } from 'mongodb';
 
 
-async function create(settings: GameSettings): Promise<Game | null> {
+async function create(id: string, settings: GameSettings, createdBy: string, otherPlayer: string): Promise<Game | null> {
+    const [ blackPlayer, whitePlayer ] = [ new ObjectId(createdBy), new ObjectId(otherPlayer) ].sort(() => Math.random() - 0.5);
+
     const game: Game = {
-        blackPlayer: undefined,
-        whitePlayer: undefined,
+        _id: new ObjectId(id),
+        blackPlayer,
+        whitePlayer,
         status: GameStatus.NotStarted,
         history: [],
         deadstonesSelections: {
@@ -18,7 +21,7 @@ async function create(settings: GameSettings): Promise<Game | null> {
         result: undefined,
         settings,
 
-        createdBy: undefined,
+        createdBy: new ObjectId(createdBy),
         createdAt: Date.now(),
     };
 

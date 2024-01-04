@@ -11,7 +11,15 @@ export const load: PageServerLoad = async ({ params, url }) => {
     }
     const player = url.searchParams.get('player');
 
-    return { game, player };
+    const serializedGame = {
+        ...game,
+        id: String(game._id),
+        blackPlayer: String(game.blackPlayer),
+        whitePlayer: String(game.whitePlayer),
+        createdBy: String(game.createdBy),
+    };
+
+    return { game: serializedGame, player };
 };
 
 export const actions: Actions = {

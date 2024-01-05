@@ -16,10 +16,10 @@ export enum Scoring {
 }
 
 export enum ResultType {
-    ByScore,
-    ByResign,
-    ByTimeout,
-    ByDisconnect,
+    Score,
+    Resign,
+    Timeout,
+    Disconnect,
 }
 
 export enum Sound {

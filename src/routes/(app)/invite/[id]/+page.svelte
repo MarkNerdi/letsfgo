@@ -1,5 +1,7 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
+    import Button from '$lib/components/ui/button/button.svelte';
+    import Card from '$lib/components/ui/card/card.svelte';
     import { activeUser } from '$lib/stores/user.store.js';
     import { fetchApi } from '$lib/utils/api.js';
     import { share } from '$lib/utils/general.js';
@@ -56,7 +58,7 @@
 
 
 <invite-view>
-    <invite-box>
+    <Card class="flex flex-col justify-between items-center gap-4 p-6">
         <invite-header>
             {#if isMyInvite}
                 <h2>Waiting for player to accept invite</h2>
@@ -87,13 +89,14 @@
         <invite-footer>
             <!-- check if invite is from current user -->
             {#if isMyInvite}
-                <button class="primary-button flex-grow" on:click={shareInviteLink}>Share invite link</button>
+                <Button on:click={shareInviteLink} >Share invite link</Button>
             {:else}
-                <button class="secondary-button flex-grow" on:click={onDeclineClick}>Decline</button>
-                <button class="primary-button flex-grow" on:click={onAcceptClick}>Accept</button>
+                <Button variant="secondary" on:click={onDeclineClick}>Decline</Button>
+                <Button on:click={onAcceptClick}>Accept</Button>
             {/if}
         </invite-footer>
-    </invite-box>
+    </Card>
+
 </invite-view>
 
 
@@ -103,16 +106,9 @@
         @apply flex justify-center items-center gap-4;
     }
 
-    invite-box {
-        @apply w-96 h-96 p-4;
-        @apply flex flex-col justify-between items-center gap-4;
-        @apply bg-white rounded-lg shadow-lg;
-
-    }
-
     invite-header {
         @apply flex justify-center items-center;
-        @apply w-full h-16;
+        @apply w-full pb-4;
 
         h2 {
             @apply text-2xl font-bold;

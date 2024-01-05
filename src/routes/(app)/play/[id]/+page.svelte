@@ -2,18 +2,23 @@
     import HistoryOverview from '$lib/components/HistoryOverview.svelte';
     import PlayerInfo from '$lib/components/PlayerInfo.svelte';
     import Board from '$lib/game/Board.svelte';
-    import { GameStatus, PlayerColor } from '$lib/game/enums';
+    import { GameStatus, PlayerColor, ResultType } from '$lib/game/enums';
     import { Game } from '$lib/game/game';
     import { browser } from '$app/environment';
     import { get, readable, type Writable } from 'svelte/store';
-    import type { GameSettings } from '$lib/game/types.js';
+    import type { GameResult, GameSettings } from '$lib/game/types.js';
     import { onDestroy } from 'svelte';
     import { fetchApi } from '$lib/utils/api.js';
+    import { Check, ChevronLeftIcon, ChevronRightIcon, ChevronsLeftIcon, ChevronsRightIcon, Flag, Hand,Undo2 } from 'lucide-svelte';
+    import Button from '$lib/components/ui/button/button.svelte';
+    import Card from '$lib/components/ui/card/card.svelte';
+    import Separator from '$lib/components/ui/separator/separator.svelte';
 
     export let data;
 
     let game: Game = Game.init(data.game);
     let status: Writable<GameStatus> = game.status;
+    let result: Writable<GameResult | undefined> = game.result;
     let displayedTurn: Writable<number> = game.displayedTurn;
     let history: Writable<string[]> = game.history; 
     let settings: GameSettings = game.settings;
@@ -22,7 +27,7 @@
     $: if (data.game && browser) {
         game = Game.init(data.game);
         player = data.player ? readable(data.player === 'black' ? PlayerColor.Black : PlayerColor.White) : game.currentTurn;
-        ({ status, history, settings, displayedTurn } = game);
+        ({ status, history, settings, displayedTurn, result } = game);
     }
 
     async function onPassClick(): Promise<void> {
@@ -115,12 +120,13 @@
     </game-container>
 
     <side-container>
-        <game-info-box>
+        <Card class="w-full h-full flex flex-col justify-center items-center gap-4">
             <game-info>
                 <div>Rapid - {settings.initialTime}+{settings.increment}</div>
                 <div>{settings.width}x{settings.height}</div>
                 <div>23.03.2023</div>
             </game-info>
+            <Separator />
             <history-container>
                 <HistoryOverview
                     history={$history}
@@ -128,49 +134,81 @@
                     onTurnClick={(index) => game.displayedTurn.set(index)}
                 />
             </history-container>
-             <current-move-buttons>
-                <button on:click={() => game.setDisplayedTurn('start')}>Start</button>
-                <button on:click={() => game.setDisplayedTurn('previous')}>Previous</button>
-                <button on:click={() => game.setDisplayedTurn('next')}>Next</button>
-                <button
-                    class="primary"
-                    on:click={() => game.setDisplayedTurn('end')}
-                >
-                    {GameStatus.InProgress ? 'Current' : 'End'}
-                </button>
+            <current-move-buttons>
+                <Button variant="secondary" class="w-full" on:click={() => game.setDisplayedTurn('start')}>
+                    <ChevronsLeftIcon />
+                </Button>
+                <Button variant="secondary" class="w-full"  on:click={() => game.setDisplayedTurn('previous')}>
+                    <ChevronLeftIcon />
+                </Button>
+                <Button variant="secondary" class="w-full"  on:click={() => game.setDisplayedTurn('next')}>
+                    <ChevronRightIcon />
+                </Button>
+                <Button class="w-full"  on:click={() => game.setDisplayedTurn('end')}>
+                    <ChevronsRightIcon />
+                </Button>
             </current-move-buttons>
+            <Separator />
             {#if $status === GameStatus.InProgress}
                 <controlls>
-                    <button class="primary" on:click={onPassClick}>Pass</button>
+                    <Button class="w-full" on:click={onPassClick}>
+                        <Hand class="mr-2 h-4 w-4" />
+                        Pass
+                    </Button>
                     <div class="w-full flex flex-row gap-4 justify-center items-center">
-                        <button>Takeback</button>
-                        <button formaction="?/resign">Resign</button>
+                        <Button variant="secondary" class="w-full">
+                            <Undo2 class="mr-2 h-4 w-4" />
+                            Takeback
+                        </Button>
+                        <Button variant="secondary" class="w-full">
+                            <Flag class="mr-2 h-4 w-4" />
+                            Resign
+                        </Button>
                     </div>
                 </controlls>
             {:else if $status === GameStatus.ChooseDeadStones}
                 <controlls>
-                    <h2>Choose Dead stones</h2>
-                    <button class="primary" on:click={onDeadStonesAcceptClick}> Accept </button>
+                    <h2 class="text-2xl">Choose Dead stones!</h2>
+                    <Button class="w-full" on:click={onDeadStonesAcceptClick}>
+                        <Check class="mr-2 h-4 w-4" />
+                        Accept
+                    </Button>
                 </controlls>
             {:else}
                 <analysis>hoi do kimmp die analyse</analysis>
             {/if}
-        </game-info-box>
-
-        <!-- Todo: Remove form -->
-        <bottom-box>
-            <form method="POST" action="?/startGame">
-                {#if $status === GameStatus.Ended}
-                    <h2>
-                        {game.getWinner()} won!
-                    </h2>
-                    <div class="w-full flex flex-row gap-4 justify-center items-center">
-                        <button class="primary" formaction="?/rematch">Rematch</button>
-                        <button class="primary">New opponent</button>
+        </Card>
+        <Card class="w-full h-full flex flex-col justify-center items-center gap-4">
+            {#if $status === GameStatus.Ended && $result}
+                <h2 class="text-3xl">{game.getWinner()} won!</h2>
+                {#if $result.type === ResultType.Score}
+                    <div class="flex gap-4">
+                        <Card class="flex flex-col items-center py-4 px-6">
+                            <h4 class="text-2xl font-bold">{$result.points.black}</h4>
+                            Black
+                        </Card>
+                        <Card class="flex flex-col items-center py-4 px-6">
+                            <div class="flex items-center gap-1">
+                                <h4 class="text-2xl font-bold">{$result.points.white - settings.komi}</h4>
+                                <p class="text-base">+{settings.komi}</p>
+                            </div>
+                            White
+                        </Card>
                     </div>
+                {:else if $result.type === ResultType.Resign}
+                    <p class="text-xl">{game.getLooser()} resigned</p>
                 {/if}
-            </form>
-        </bottom-box>
+                <div class="w-full flex flex-row gap-4 justify-center items-center">
+                    <Button >
+                        Rematch
+                    </Button>
+                    <Button>
+                        New opponent
+                    </Button>
+                </div>
+            {/if}
+        </Card>
+
     </side-container>
 </play-view>
 
@@ -195,32 +233,14 @@
         @apply flex flex-col justify-center items-center gap-2;
     }
 
-    game-info-box,
-    bottom-box {
-        @apply w-full h-full;
-        @apply flex flex-col;
-        @apply bg-gray-100;
-        @apply border border-solid border-gray-500;
-        @apply rounded-md;
-    }
-
-    game-info-box {
-        @apply flex-grow;
-        @apply divide-y divide-solid divide-gray-500;
-    }
-
-    bottom-box {
-        @apply flex flex-col justify-center items-center gap-4;
-    }
-
     game-info,
     history-container {
-        @apply w-full p-4;
+        @apply w-full px-4;
     }
 
     game-info {
         @apply flex flex-row justify-between items-center gap-4;
-        @apply bg-white rounded-t-md;
+        @apply rounded-t-md pt-4;
     }
 
     history-container {
@@ -228,24 +248,10 @@
     }
 
     current-move-buttons {
-        @apply flex flex-row justify-between items-center gap-1 p-1;
-        @apply bg-white;
-
-        button {
-            @apply w-full;
-        }
+        @apply w-full flex flex-row justify-between items-center gap-1 p-1;
     }
 
     controlls {
-        @apply flex flex-grow flex-col justify-center items-center gap-4 p-4;
-    }
-
-    button {
-        @apply w-fit px-4 py-2 rounded-md;
-        @apply bg-gray-500 text-white cursor-pointer;
-
-        &.primary {
-            @apply bg-blue-500;
-        }
+        @apply w-full flex flex-grow flex-col justify-center items-center gap-4 p-4;
     }
 </style>

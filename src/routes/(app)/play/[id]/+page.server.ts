@@ -74,7 +74,7 @@ export const actions: Actions = {
         const gameId = String(data.get('gameId'));
 
         const gameResult: GameResult = {
-            type: ResultType.ByResign,
+            type: ResultType.Resign,
             winner: currentPlayer === PlayerColor.Black ? PlayerColor.White : PlayerColor.Black,
         };
 

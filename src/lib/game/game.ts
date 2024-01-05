@@ -57,7 +57,7 @@ export class Game {
 
         game.status.set(dbGame.status);
         game.result.set(dbGame.result);
-        if (dbGame.result?.type === ResultType.ByScore) {
+        if (dbGame.result?.type === ResultType.Score) {
             game.deadStones.set(dbGame.result.deadStones);
         }
 
@@ -148,6 +148,11 @@ export class Game {
     getWinner(): string {
         const { black, white } = this.getFinalScore();
         return black > white ? 'Black' : 'White';
+    }
+
+    getLooser(): string {
+        const { black, white } = this.getFinalScore();
+        return black > white ? 'White' : 'Black';
     }
 
     updateHistory(history: Move[], playSound = true): void {

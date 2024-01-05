@@ -1,43 +1,26 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import { fetchApi } from '$lib/utils/api';
+    import CreateCustomGame from '$lib/components/CreateCustomGame.svelte';
+    import { Button } from '$lib/components/ui/button';
     import { activeUser } from '$lib/stores/user.store';
 
-    const gameData = {
-        columns: 9,
-        rows: 9,
-    };
-
-    async function createGame() {
-        try {
-            const { inviteId } = await fetchApi('/api/invite', 'POST', gameData);
-            goto(`/invite/${inviteId}`);
-        } catch (error) {
-            // TODO: Display error
-        }
-    }
 </script>
 
-<game-settings class="p-5">
-    <box>
-        <div class="label">Columns</div>
-        <input type="number" bind:value={gameData.columns} />
-    </box>
-    <box>
-        <div class="label">Rows</div>
-        <input type="number" bind:value={gameData.rows} />
-    </box>
-    <button class="primary-button" on:click={createGame}>Start game</button>
-</game-settings>
-<h2>Hello {$activeUser?.name}</h2>
+<home-view>
+    <h1 class="text-5xl font-bold">Welcome Player!</h1>
+    {#if $activeUser}
+        <CreateCustomGame />
+    {:else}
+        <h2 class="text-2xl">You're not logged in. To continue, please first create an account or log in</h2>
+        <Button on:click={() => goto('/auth/signin')}>Sign in</Button>
+    {/if}
+
+
+</home-view>
 
 <style lang="postcss">
-    game-settings {
-        @apply w-[300px];
-        @apply flex justify-center items-center gap-4;
-
-        box {
-            width: 100px;
-        }
+    home-view {
+        @apply w-full h-full;
+        @apply flex flex-col justify-center items-center gap-8;
     }
 </style>

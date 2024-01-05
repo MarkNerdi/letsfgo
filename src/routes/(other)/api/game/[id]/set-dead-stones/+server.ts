@@ -36,7 +36,7 @@ export const POST: RequestHandler = (async ({ params, request }) => {
     const scoring = getAreaScoring(boardState, game.settings.komi);
 
     const result: GameResult = {
-        type: ResultType.ByScore,
+        type: ResultType.Score,
         deadStones: stones,
         points: scoring,
         winner: scoring.black > scoring.white ? PlayerColor.Black : PlayerColor.White,

@@ -10,18 +10,18 @@ export type Stone = {
 export type Unit = Stone[];
 
 export type GameResult = {
-    type: ResultType.ByScore
+    type: ResultType.Score
     deadStones: Stone[];
     points: { black: number, white: number }
     winner: PlayerColor
 } | {
-    type: ResultType.ByResign
+    type: ResultType.Resign
     winner: PlayerColor
 } | {
-    type: ResultType.ByTimeout
+    type: ResultType.Timeout
     winner: PlayerColor
 } | {
-    type: ResultType.ByDisconnect
+    type: ResultType.Disconnect
     winner: PlayerColor
 }
 

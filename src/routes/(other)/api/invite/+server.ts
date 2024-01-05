@@ -1,24 +1,14 @@
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { Scoring } from '$lib/game/enums';
-import type { GameSettings } from '$lib/game/types';
 import { inviteController } from '$lib/server/game-invites/game-invites.controller';
 
 export const POST: RequestHandler = (async ({ request, locals }) => {
     const session = await locals.getSession();
-    const { columns, rows } = await request.json();
+    const settings = await request.json();
 
 
     const user = session?.user;
-
-    const settings: GameSettings = {
-        width: columns,
-        height: rows,
-        initialTime: 5,
-        increment: 3,
-        komi: 3,
-        scoring: Scoring.Area,
-    };
 
     if (!user?.id) {
         return error(400, 'You have to be logged in.');

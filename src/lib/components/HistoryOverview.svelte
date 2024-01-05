@@ -38,11 +38,11 @@
 
     button {
         @apply flex flex-row gap-1 items-center justify-center;
-        @apply rounded-md hover:bg-blue-100;
+        @apply rounded-md ;
         @apply p-1;
 
-        &.current {
-            @apply bg-blue-200;
+        &:hover, &.current {
+            @apply bg-secondary;
         }
     }
     
@@ -56,7 +56,7 @@
         @apply border border-solid border-black bg-white;
 
         &.black {
-            @apply bg-black;
+            @apply bg-black border-white;
         }
     }
 </style>

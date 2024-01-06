@@ -37,6 +37,6 @@
     }
 
     main {
-        @apply flex-grow w-full;
+        @apply flex-grow w-full flex items-center justify-center;
     }
 </style>

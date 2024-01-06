@@ -4,7 +4,18 @@
     import { ToggleGroupItem } from '$lib/components/ui/toggle-group';
     import ToggleGroup from '$lib/components/ui/toggle-group/toggle-group.svelte';
     import Separator from '$lib/components/ui/separator/separator.svelte';
+    import { fetchApi } from '$lib/utils/api';
 
+    let boardSizes: string[] = [];
+    let timeSettings: string[] = [];
+
+    async function onFindGameClick(): Promise<void> {
+        try {
+            await fetchApi('/api/lobby', 'POST', { boardSizes, timeSettings });
+        } catch (error) {
+            // TODO: Display error
+        }
+    }
 </script>
 
 <Card>
@@ -15,7 +26,7 @@
 		</CardDescription>
 	</CardHeader>
 	<CardContent class="grid gap-6">
-        <ToggleGroup variant="outline" type="multiple" class="grid grid-cols-3 gap-4">
+        <ToggleGroup variant="outline" type="multiple" class="grid grid-cols-3 gap-4" bind:value={boardSizes}>
             <ToggleGroupItem value="9">
                 <h3 class="text-lg font-bold">9x9</h3>
             </ToggleGroupItem>
@@ -27,7 +38,7 @@
             </ToggleGroupItem>
         </ToggleGroup>
         <Separator />
-        <ToggleGroup variant="outline" type="multiple" class="grid grid-cols-3 gap-4">
+        <ToggleGroup variant="outline" type="multiple" class="grid grid-cols-3 gap-4" bind:value={timeSettings}>
             <ToggleGroupItem value="5+5">
                 <h3 class="text-lg font-bold">5+5</h3>
             </ToggleGroupItem>
@@ -60,6 +71,12 @@
         </ToggleGroup>        
 	</CardContent>
 	<CardFooter>
-		<Button class="w-full">Let's GO!</Button>
+		<Button
+            on:click={onFindGameClick}
+            disabled={boardSizes.length === 0 || timeSettings.length === 0}
+            class="w-full"
+        >
+            Let's GO!
+        </Button>
 	</CardFooter>
 </Card>

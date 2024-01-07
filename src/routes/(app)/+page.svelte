@@ -8,7 +8,7 @@
     import type { Lobby } from '$lib/server/lobbies/lobbies.types';
     import { activeUser } from '$lib/stores/user.store';
     import { fetchApi } from '$lib/utils/api';
-    import { onDestroy } from 'svelte';
+    import { onDestroy, onMount } from 'svelte';
 
     let lobbies: Lobby[] = [];
 
@@ -20,6 +20,11 @@
             lobbies = response.lobbies;
         }, 1000);
     }
+
+    onMount(async () => {
+        const response = await fetchApi('/api/lobby', 'GET');
+        lobbies = response.lobbies;
+    });
 
     onDestroy(() => {
         clearInterval(intervalId);

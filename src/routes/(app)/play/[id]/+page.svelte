@@ -5,7 +5,7 @@
     import { GameStatus, PlayerColor, ResultType } from '$lib/game/enums';
     import { Game } from '$lib/game/game';
     import { browser } from '$app/environment';
-    import { get, readable, type Writable } from 'svelte/store';
+    import { get, type Writable } from 'svelte/store';
     import type { GameResult, GameSettings } from '$lib/game/types.js';
     import { onDestroy } from 'svelte';
     import { fetchApi } from '$lib/utils/api.js';
@@ -13,6 +13,7 @@
     import Button from '$lib/components/ui/button/button.svelte';
     import Card from '$lib/components/ui/card/card.svelte';
     import Separator from '$lib/components/ui/separator/separator.svelte';
+    import { activeUser } from '$lib/stores/user.store.js';
 
     export let data;
 
@@ -22,11 +23,11 @@
     let displayedTurn: Writable<number> = game.displayedTurn;
     let history: Writable<string[]> = game.history; 
     let settings: GameSettings = game.settings;
-    let player = data.player ? readable(data.player === 'black' ? PlayerColor.Black : PlayerColor.White) : game.currentTurn;
+    let player = $activeUser === game.blackPlayer ? PlayerColor.Black : $activeUser === game.whitePlayer ? PlayerColor.White : undefined;
 
     $: if (data.game && browser) {
         game = Game.init(data.game);
-        player = data.player ? readable(data.player === 'black' ? PlayerColor.Black : PlayerColor.White) : game.currentTurn;
+        player = $activeUser === game.blackPlayer ? PlayerColor.Black : $activeUser === game.whitePlayer ? PlayerColor.White : undefined;
         ({ status, history, settings, displayedTurn, result } = game);
     }
 
@@ -42,25 +43,14 @@
     }
 
     async function onDeadStonesAcceptClick(): Promise<void> {
-        if (!game) return;
+        if (!game || !player) return;
 
         await fetchApi(`/api/game/${game.id}/set-dead-stones`,
             'POST', 
             {
                 stones: get(game.deadStones),
-                player: $player,
             }
         ).catch(err => console.error(err));
-
-        if (!data.player) {
-            await fetchApi(`/api/game/${game.id}/set-dead-stones`, 
-                'POST',
-                {
-                    stones: get(game.deadStones),
-                    player: $player === PlayerColor.Black ? PlayerColor.White : PlayerColor.Black,
-                }
-            ).catch(err => console.error(err));
-        }
     }
 
     function onKey(event: KeyboardEvent): void {

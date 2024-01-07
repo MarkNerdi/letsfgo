@@ -4,12 +4,11 @@ import { gameController } from '$lib/server/games/games.controller.ts';
 import { GameStatus, PlayerColor, ResultType, Scoring } from '$lib/game/enums.ts';
 import type { GameResult, GameSettings } from '$lib/game/types.ts';
 
-export const load: PageServerLoad = async ({ params, url }) => {
+export const load: PageServerLoad = async ({ params }) => {
     const game = await gameController.getById(params.id);
     if (!game) {
         throw redirect(303, '/');
     }
-    const player = url.searchParams.get('player');
 
     const serializedGame = {
         ...game,
@@ -19,7 +18,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
         createdBy: String(game.createdBy),
     };
 
-    return { game: serializedGame, player };
+    return { game: serializedGame };
 };
 
 export const actions: Actions = {

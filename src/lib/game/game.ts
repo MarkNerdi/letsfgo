@@ -19,8 +19,10 @@ export class Game {
     public currentTurn: Readable<PlayerColor>;
     public settings: GameSettings;
     public result: Writable<GameResult | undefined>;
+    public blackPlayer: string;
+    public whitePlayer: string;
 
-    constructor(id: string, settings: GameSettings) {
+    constructor(id: string, settings: GameSettings, blackPlayer: string, whitePlayer: string) {
         this.id = id;
         this.settings = settings;
 
@@ -31,7 +33,8 @@ export class Game {
         this.result = writable(undefined);
         this.killedStones = writable([]);
         this.displayedTurn = writable(0);
-
+        this.blackPlayer = blackPlayer;
+        this.whitePlayer = whitePlayer;
 
         const initialBoardState: BoardState = Array.from({ length: settings.height }, () => {
             return Array.from({ length: settings.width }, () => undefined);
@@ -52,7 +55,7 @@ export class Game {
     }
 
     static init(dbGame: DBGame): Game {
-        const game = new Game(String(dbGame._id), dbGame.settings);
+        const game = new Game(String(dbGame._id), dbGame.settings, String(dbGame.blackPlayer), String(dbGame.whitePlayer));
         game.updateHistory(dbGame.history, false);
 
         game.status.set(dbGame.status);

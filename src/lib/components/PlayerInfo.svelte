@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Stone from '$lib/components/Stone.svelte';
     import { PlayerColor } from '$lib/game/enums';
 
     export let color: PlayerColor;
@@ -7,6 +8,7 @@
 </script>
 
 <player-info>
+    <Stone {color} size={30} />
     <stone class:black={color === PlayerColor.Black} />
     <p>{name} · {rank}</p>
 </player-info>
@@ -14,15 +16,5 @@
 <style lang="postcss">
     player-info {
         @apply flex flex-row justify-center items-center gap-2;
-    }
-
-    stone {
-        @apply block;
-        @apply w-[30px] h-[30px] rounded-full;
-        @apply border border-solid border-black bg-white;
-
-        &.black {
-            @apply bg-black;
-        }
     }
 </style>

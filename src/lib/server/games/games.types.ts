@@ -5,8 +5,8 @@ import type { ObjectId } from 'mongodb';
 export type Game = {
     _id?: ObjectId | string;
 
-    blackPlayer: ObjectId | undefined;
-    whitePlayer: ObjectId | undefined;
+    blackPlayer: ObjectId | string | undefined;
+    whitePlayer: ObjectId | string | undefined;
     status: GameStatus;
 
     settings: GameSettings;
@@ -18,7 +18,7 @@ export type Game = {
     }
     result: GameResult | undefined;
     
-    createdBy: ObjectId | undefined;
+    createdBy: ObjectId | string;
     createdAt: number;
 };
 

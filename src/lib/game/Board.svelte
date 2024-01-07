@@ -150,13 +150,9 @@
 
 <style lang="postcss" scoped>
     outer-game-board {
-        @apply flex justify-center items-center gap-4;
-        @apply border border-solid border-gray-500;
-        @apply bg-white;
-
-        &.burlywood {
-            @apply bg-[burlywood];
-        }
+        @apply flex justify-center items-center gap-4 rounded-lg;
+        background-image: url('../assets/boards/marble.jpg');
+        background-size: cover;
     }
 
     inner-game-board {

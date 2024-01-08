@@ -9,7 +9,7 @@
     import Stone from '$lib/components/Stone.svelte';
 
     export let game: Game;
-    export let player: PlayerColor;
+    export let player: PlayerColor | undefined;
 
     const boardSize = 700;
     const boardPadding = 50;
@@ -33,6 +33,11 @@
     $: rows = $boardState[0]?.length ? 9 : 9;
     $: stoneSize = boardSize / Math.max(columns, rows);
     $: validNextMoves = getValidNextMoves($boardState, $history, $currentTurn);
+
+
+    $: console.log($status);
+    $: console.log(player);
+    
 
     async function onEmptyClick(x: number, y: number): Promise<void> {
         if (!game) return;
@@ -94,30 +99,26 @@
                                     {@const isDead = $deadStones?.some(
                                         (stone) => stone.x === index && stone.y === index2
                                     )}
-                                    <button class="choose-unit"
+                                    <button class="choose-unit {isHovered || isDead ? 'opacity-60' : ''}}"
                                         on:click={() => onUnitClick(index, index2)}
                                         on:mouseleave={() => (hoveredCoordinate = undefined)}
                                         on:mouseenter={() => (hoveredCoordinate = { x: index, y: index2 })}
                                     >
-                                        <stone
-                                            class:black={$boardState[index][index2] === PlayerColor.Black}
-                                            class:hovered={isHovered}
-                                            class:dead={isDead}
-                                        >
+                                        <Stone color={$boardState[index][index2]}>
                                             <evaluated-field class:black={isBlack} class:white={isWhite} />
-                                        </stone>
+                                        </Stone>
                                     </button>
                                 {:else}
                                     <evaluated-field class:black={isBlack} class:white={isWhite} />
                                 {/if}
                             {:else if $status === GameStatus.Ended && evaluatedBoardState}
                                 {#if cleanedBoardState && $cleanedBoardState[index][index2] !== undefined}
-                                    <stone class:black={$cleanedBoardState[index][index2] === PlayerColor.Black}>
+                                    <Stone color={$cleanedBoardState[index][index2]} >
                                         <evaluated-field
                                             class:black={evaluatedBoardState[index][index2] === PlayerColor.Black}
                                             class:white={evaluatedBoardState[index][index2] === PlayerColor.White}
                                         />
-                                    </stone>
+                                    </Stone>
                                 {:else}
                                     <evaluated-field
                                         class:black={evaluatedBoardState[index][index2] === PlayerColor.Black}
@@ -129,7 +130,7 @@
                                     {#if player === $currentTurn}
                                         {#if validNextMoves[index][index2]}
                                             <button class="place-stone" on:click={() => onEmptyClick(index, index2)}>
-                                                <stone class:black={player === PlayerColor.Black} />
+                                                <Stone color={player} />
                                             </button>
                                         {:else}
                                             <!-- TODO: Add errorstate -->
@@ -139,7 +140,7 @@
                                         <div />
                                     {/if}
                                 {:else}
-                                    <Stone color={$boardState[index][index2]} size={75} />
+                                    <Stone color={$boardState[index][index2]} />
                                 {/if}
                             {/if}
                         </board-item>
@@ -189,15 +190,10 @@
         @apply w-full h-full cursor-pointer;
         @apply flex justify-center items-center;
         @apply bg-transparent;
+        @apply opacity-0;
 
         &:hover {
-            stone {
-                @apply opacity-60;
-            }
-        }
-
-        stone {
-            @apply opacity-0;
+            @apply opacity-60;
         }
     }
 
@@ -205,25 +201,6 @@
         @apply w-full h-full cursor-pointer;
         @apply flex justify-center items-center;
         @apply bg-transparent;
-    }
-
-    stone {
-        @apply w-[90%] h-[90%] rounded-full;
-        @apply border-2 border-solid border-black ;
-        @apply flex justify-center items-center;
-        z-index: 1;
-
-        &.black {
-            /* @apply bg-black; */
-        }
-
-        &.dead {
-            @apply opacity-60;
-        }
-        &.hovered {
-            @apply opacity-60;
-            @apply cursor-pointer;
-        }
     }
 
     evaluated-field {

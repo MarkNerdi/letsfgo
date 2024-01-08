@@ -8,8 +8,9 @@
 </script>
 
 <player-info>
-    <Stone {color} size={30} />
-    <stone class:black={color === PlayerColor.Black} />
+    <div class="w-[35px] h-[35px]">
+        <Stone {color} />
+    </div>
     <p>{name} · {rank}</p>
 </player-info>
 

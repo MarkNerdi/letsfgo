@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { PlayerColor } from '$lib/game/enums';
+    import Stone from '$lib/components/Stone.svelte';
     import { getPlayerByTurn } from '$lib/game/utils';
 
     export let history: string[] = [];
@@ -20,7 +20,9 @@
         <div class="flex flex-row gap-1 items-center">
             <button on:click={() => onTurnClick(index + 1)} class:current={index === currentTurn - 1}>
                 <p>{index + 1}.</p>
-                <stone class:black={getPlayerByTurn(index) === PlayerColor.Black} />
+                <div class="w-[15px] h-[15px]">
+                    <Stone color={getPlayerByTurn(index)} />
+                </div>
                 <p>{item}</p>
             </button>
 
@@ -48,15 +50,5 @@
     
     p {
         @apply text-sm;
-    }
-
-    stone {
-        @apply block;
-        @apply w-[15px] h-[15px] rounded-full;
-        @apply border border-solid border-black bg-white;
-
-        &.black {
-            @apply bg-black border-white;
-        }
     }
 </style>

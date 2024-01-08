@@ -23,11 +23,11 @@
     let displayedTurn: Writable<number> = game.displayedTurn;
     let history: Writable<string[]> = game.history; 
     let settings: GameSettings = game.settings;
-    let player = $activeUser === game.blackPlayer ? PlayerColor.Black : $activeUser === game.whitePlayer ? PlayerColor.White : undefined;
+    let player = $activeUser?.id === game.blackPlayer ? PlayerColor.Black : $activeUser?.id === game.whitePlayer ? PlayerColor.White : undefined;
 
     $: if (data.game && browser) {
         game = Game.init(data.game);
-        player = $activeUser === game.blackPlayer ? PlayerColor.Black : $activeUser === game.whitePlayer ? PlayerColor.White : undefined;
+        player = $activeUser?.id === game.blackPlayer ? PlayerColor.Black : $activeUser?.id === game.whitePlayer ? PlayerColor.White : undefined;
         ({ status, history, settings, displayedTurn, result } = game);
     }
 

@@ -2,27 +2,24 @@
     import { PlayerColor } from '$lib/game/enums';
 
     export let color: PlayerColor = PlayerColor.Black;
-    export let size: number = 75;
-
-    const colors = {
-        [PlayerColor.Black]: {
-            main: '#000000',
-            bg: '#111111',
-            accent: '#232323',
-        },
-        [PlayerColor.White]: {
-            main: '#f4f4f4',
-            bg: '#eeeeee',
-            accent: '#ffffff',
-        },
-    };
-
-    $: svgColor = colors[color];
-
 </script>
 
-<svg width={`${size}px`} height={`${size}px`} viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--noto" preserveAspectRatio="xMidYMid meet">
-    <circle cx="63.93" cy="64" r="60" fill={svgColor.bg}></circle>
-    <circle cx="60.03" cy="63.1" r="56.1" fill={svgColor.main}></circle>
-    <path d="M23.93 29.7c4.5-7.1 14.1-13 24.1-14.8c2.5-.4 5-.6 7.1.2c1.6.6 2.9 2.1 2 3.8c-.7 1.4-2.6 2-4.1 2.5a44.64 44.64 0 0 0-23 17.4c-2 3-5 11.3-8.7 9.2c-3.9-2.3-3.1-9.5 2.6-18.3z" fill={svgColor.accent}></path>
-</svg>
+<stone class:black={color === PlayerColor.Black} class="{color === PlayerColor.Black ? 'black' : 'white'}" >
+    <slot />
+</stone>
+
+<style lang="postcss">
+    stone {
+        @apply w-[90%] h-[90%];
+        @apply flex justify-center items-center;
+        @apply rounded-full;
+
+        &.white {
+            background: radial-gradient(circle at 24.1% 68.8%, rgb(241, 241, 242) 0.1%, rgb(188, 192, 197) 100.2%);
+        }
+
+        &.black {
+            background: radial-gradient(circle at 24.1% 68.8%, rgb(50, 50, 50) 0%, rgb(0, 0, 0) 99.4%);
+        }
+    }
+</style>

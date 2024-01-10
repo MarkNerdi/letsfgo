@@ -7,7 +7,7 @@ import { playSound } from '$lib/utils/sound';
 import type { Game as DBGame, Move } from '$lib/server/games/games.types';
 
 export class Game {
-    public id: string;
+    public id?: string;
     public status: Writable<GameStatus>;
     public boardState: Readable<BoardState>;
     public cleanedBoardState: Readable<BoardState>;
@@ -19,10 +19,10 @@ export class Game {
     public currentTurn: Readable<PlayerColor>;
     public settings: GameSettings;
     public result: Writable<GameResult | undefined>;
-    public blackPlayer: string;
-    public whitePlayer: string;
+    public blackPlayer?: string;
+    public whitePlayer?: string;
 
-    constructor(id: string, settings: GameSettings, blackPlayer: string, whitePlayer: string) {
+    constructor(settings: GameSettings, id?: string, blackPlayer?: string, whitePlayer?: string) {
         this.id = id;
         this.settings = settings;
 
@@ -55,7 +55,7 @@ export class Game {
     }
 
     static init(dbGame: DBGame): Game {
-        const game = new Game(String(dbGame._id), dbGame.settings, String(dbGame.blackPlayer), String(dbGame.whitePlayer));
+        const game = new Game(dbGame.settings, String(dbGame._id), String(dbGame.blackPlayer), String(dbGame.whitePlayer));
         game.updateHistory(dbGame.history, false);
 
         game.status.set(dbGame.status);

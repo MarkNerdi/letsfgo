@@ -8,8 +8,11 @@
     import { ToggleGroup, ToggleGroupItem } from '$lib/components/ui/toggle-group';
     import { Scoring } from '$lib/game/enums';
     import type { GameSettings } from '$lib/game/types';
-    import { fetchApi } from '$lib/utils/api';
-    import { goto } from '$app/navigation';
+
+    export let button: { label: string; variant: 'link' | 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | undefined };
+    export let title: { title: string; subtitle: string };
+    export let onCreateGameClick: (settings: GameSettings) => void = () => {};
+
 
     let scoring = { value: Scoring.Area, label: 'Area' };
     let boardSize = '9';
@@ -17,33 +20,26 @@
     let minTimePerTurn = 15;
     let komi = 5.5;
 
-    async function createGame(): Promise<void> {
-        const gameSettings: GameSettings = {
-            width: parseInt(boardSize),
-            height: parseInt(boardSize),
-            initialTime,
-            increment: minTimePerTurn,
-            komi,
-            scoring: scoring.value,
-        };
-        try {
-            const { inviteId } = await fetchApi('/api/invite', 'POST', gameSettings);
-            goto(`/invite/${inviteId}`);
-        } catch (error) {
-            // TODO: Display error
-        }
-    }
+    $: settings = {
+        width: parseInt(boardSize),
+        height: parseInt(boardSize),
+        initialTime,
+        increment: minTimePerTurn,
+        komi,
+        scoring: scoring.value,
+    };
+
 </script>
 
 <Dialog.Root>
-    <Dialog.Trigger class={buttonVariants({ variant: 'outline' })}>
-        Play with a friend
+    <Dialog.Trigger class={buttonVariants({ variant: button.variant })}>
+        {button.label}
     </Dialog.Trigger>
     <Dialog.Content class="sm:max-w-[425px]">
         <Dialog.Header>
-            <Dialog.Title>Play with a friend</Dialog.Title>
+            <Dialog.Title>{title.title}</Dialog.Title>
             <Dialog.Description>
-                Create a game and have fun with your friend!
+                {title.subtitle}
             </Dialog.Description>
         </Dialog.Header>
         <div class="grid gap-4 py-4">
@@ -100,7 +96,7 @@
             </div>
         </div>
         <Dialog.Footer>
-            <Button on:click={createGame}>Create Game</Button>
+            <Button on:click={() => onCreateGameClick(settings)}>Create Game</Button>
         </Dialog.Footer>
     </Dialog.Content>
 </Dialog.Root>

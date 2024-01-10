@@ -4,7 +4,7 @@
 
     export let color: PlayerColor;
     export let name: string;
-    export let rank: string;
+    export let rank: string = '';
 </script>
 
 <player-info>

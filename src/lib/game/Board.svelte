@@ -10,8 +10,9 @@
 
     export let game: Game;
     export let player: PlayerColor | undefined;
+    export let onFieldClick: (x: number, y: number) => Promise<void> = () => Promise.resolve();
 
-    const boardSize = 700;
+    const boardSize = 750;
     const boardPadding = 50;
 
 
@@ -29,27 +30,17 @@
     $: evaluatedBoardState =
         $status === GameStatus.ChooseDeadStones || $status === GameStatus.Ended ? getEvaluatedBoardState($cleanedBoardState) : undefined;
 
-    $: columns = $boardState.length ? 9 : 9;
-    $: rows = $boardState[0]?.length ? 9 : 9;
+    $: columns = $boardState.length ?? 9;
+    $: rows = $boardState[0]?.length ?? 9;
     $: stoneSize = boardSize / Math.max(columns, rows);
     $: validNextMoves = getValidNextMoves($boardState, $history, $currentTurn);
 
 
-    $: console.log($status);
-    $: console.log(player);
-    
-
     async function onEmptyClick(x: number, y: number): Promise<void> {
-        if (!game) return;
-
+        if (!game || player === undefined) return;
         game.setStone(player, x, y);
 
-        await fetch(`/api/game/${game.id}/add-move`, {
-            method: 'POST',
-            body: JSON.stringify({
-                action: `${x},${y}`,
-            }),
-        }).catch(err => console.error(err));
+        onFieldClick?.(x, y);
     }
 
     let hoveredCoordinate: StoneType | undefined = undefined;

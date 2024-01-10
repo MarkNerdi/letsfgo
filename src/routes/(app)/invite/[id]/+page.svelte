@@ -14,7 +14,7 @@
     async function onAcceptClick(): Promise<void> {
         try {
             await fetchApi(`/api/invite/${invite._id}/accept`, 'PUT');
-            goto(`/play/${invite._id}`);
+            goto(`/play/online/${invite._id}`);
         } catch (error) {
             console.error(error);
         }
@@ -42,7 +42,7 @@
                 const response = await fetchApi(`/api/game/${invite._id}/game-state`, 'GET');
                 if (response.success) {
                     clearInterval(intervalId);
-                    goto(`/play/${invite._id}`);
+                    goto(`/play/online/${invite._id}`);
                 }
             } catch {
                 // do nothing

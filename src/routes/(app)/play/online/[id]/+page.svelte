@@ -31,6 +31,15 @@
         ({ status, history, settings, displayedTurn, result } = game);
     }
 
+    async function onFieldClick(x: number, y: number): Promise<void> {
+        await fetch(`/api/game/${game.id}/add-move`, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: `${x},${y}`,
+            }),
+        }).catch(err => console.error(err));
+    }
+
     async function onPassClick(): Promise<void> {
         if (!game) return;
 
@@ -99,12 +108,12 @@
 <play-view>
     <game-container>
         <player-section>
-            <PlayerInfo color={PlayerColor.Black} name="Player 2" rank="2d" />
+            <PlayerInfo color={PlayerColor.White} name="Player 2" rank="2d" />
             <div>03:03</div>
         </player-section>
-        <Board bind:game {player} />
+        <Board bind:game {player} {onFieldClick} />
         <player-section>
-            <PlayerInfo color={PlayerColor.White} name="Player 1" rank="1d" />
+            <PlayerInfo color={PlayerColor.Black} name="Player 1" rank="1d" />
             <div>03:03</div>
         </player-section>
     </game-container>

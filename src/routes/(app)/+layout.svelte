@@ -1,5 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
+    import Menu from '$lib/components/Menu.svelte';
     import Button from '$lib/components/ui/button/button.svelte';
     import { ThemeSwitcher } from '$lib/components/ui/theme-switcher';
     import { activeUser } from '$lib/stores/user.store';
@@ -9,10 +10,12 @@
 
 <div class="flex flex-col h-screen w-screen">
     <header>
-        <a href="/">
-            <h2 class="text-3xl">Let's f go</h2>
-        </a>
-        
+        <div class="flex justify-between items-center gap-4">
+            <a href="/">
+                <h2 class="text-3xl">Let's f go</h2>
+            </a>
+            <Menu />
+        </div>
         <div class="flex justify-between items-center gap-4">
             <ThemeSwitcher />
             {#if !$activeUser}
